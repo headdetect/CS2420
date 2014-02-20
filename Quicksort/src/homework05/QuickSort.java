@@ -7,54 +7,34 @@ public class QuickSort {
 	}
 
 	public void start() {
-		double[] fill = createRandomDoubleArray(10);
+		double[] fill = createRandomDoubleArray(100000);
 		outputArray(fill);
-		quickSort(fill, 0, fill.length);
+		quickSort(fill, 0, fill.length - 1);
 		outputArray(fill);
-	}
-
-	private void outputArray(double[] data) {
-		System.out.print("{ ");
-		for(int i = 0; i < data.length; i++) {
-			System.out.print(data[i]);
-			if(i != data.length - 1) {
-				System.out.print(",");
-			}
-		}
-		System.out.println(" }");
-	}
-
-	private double[] createRandomDoubleArray(int len) {
-		double[] data = new double[len];
-		for(int i = 0; i < len; i++)
-			data[i] = Math.random();
-		return data;
+		System.out.println("is sorted: " + isSorted(fill));
 	}
 
 	public double[] quickSort(double[] array, int start, int end) {
 		int part = partition(array, start, end);
-		
-		if(array.length <= 2) {
+
+		if (end - start <= 2)
 			return array;
-		}
-		
-		if(start < part - 1) {
+
+		if (start < part - 1) {
 			quickSort(array, start, part - 1);
 		}
-		if(part < end) {
+		if (part < end) {
 			quickSort(array, part, end);
 		}
-		
+
 		return array;
 	}
-	
-	
+
 	public int partition(double[] data, int start, int end) {
-		
+
 		double pivot = data[end];
 		int left = start;
 		int right = end - 1;
-		
 
 		while (true) {
 
@@ -75,15 +55,42 @@ public class QuickSort {
 
 			left++;
 			right--;
-			
 		}
-		
-		// Swapping left and right //
+
+		// Swapping elements //
 		double temp = data[left];
-		data[left] = data[right];
-		data[right] = temp;
-		
+		data[left] = pivot;
+		data[end] = temp;
+
 		return left;
 	}
 
+	private void outputArray(double[] data) {
+		System.out.print("{ ");
+		for (int i = 0; i < data.length; i++) {
+			System.out.print(data[i]);
+			if (i != data.length - 1) {
+				System.out.print(",");
+			}
+		}
+		System.out.println(" }");
+	}
+
+	private double[] createRandomDoubleArray(int len) {
+		double[] data = new double[len];
+		for (int i = 0; i < len; i++)
+			data[i] = Math.random();
+		return data;
+	}
+
+	/** Just a test method **/
+	public static boolean isSorted(double[] a) {
+		for (int i = 0; i < a.length - 1; i++) { 
+			if (a[i] > a[i + 1]) {
+				return false;
+			}
+		}
+
+		return true; 
+	}
 }
