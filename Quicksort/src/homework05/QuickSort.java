@@ -3,7 +3,10 @@ package homework05;
 import java.util.Random;
 
 /**
- * The Class QuickSort...
+ * Several tests to run for quick sort.
+ * 
+ * @author Brayden Lopez.
+ * @version v1b, Feb 21, 2014.
  */
 public class QuickSort
 {
