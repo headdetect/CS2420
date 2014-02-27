@@ -1,0 +1,24 @@
+FoodItem - UPC Code: 0353264991  Shelf life: 2  Name: chestnut puree with vanilla
+FoodItem - UPC Code: 0984523912  Shelf life: 1  Name: the orange box
+Warehouse - Columbus
+Warehouse - Scottsdale
+Warehouse - Tacoma
+Start date: 05/01/2010
+Receive: 0984523912 7 Tacoma
+Receive: 0353264991 6 Tacoma
+Receive: 0353264991 2 Scottsdale
+Request: 0984523912 5 Tacoma
+Next day:
+Request: 0984523912 4 Columbus
+Request: 0353264991 4 Columbus
+Next day:
+Receive: 0353264991 9 Columbus
+Receive: 0984523912 2 Columbus
+Request: 0353264991 3 Scottsdale
+Next day:
+Request: 0984523912 8 Scottsdale
+Receive: 0984523912 8 Columbus
+Request: 0984523912 3 Tacoma
+Request: 0353264991 10 Tacoma
+Request: 0984523912 5 Tacoma
+End
