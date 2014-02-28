@@ -51,7 +51,20 @@ public class SpecialtySetTest
         s.add("Hello");
         
         // Bug in test, not your code, so fix the test first.
-        assertEquals("The set should contain 'Hello': ", true, s.contains("hello"));  
+        assertEquals("The set should contain 'Hello': ", true, s.contains("Hello"));
+        
+        s.add("1");
+        s.add("1"); // shouldnt add
+        s.add("3");
+        s.add("2");
+        s.add("1"); // shouldnt add
+        s.add("5");
+        s.add("0");
+        s.remove("1");
+        s.remove("3");
+        
+        assertTrue(s.contains("2"));
+        assertFalse(s.contains("1"));
     }
     
     /**

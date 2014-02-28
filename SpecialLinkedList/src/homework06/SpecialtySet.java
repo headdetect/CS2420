@@ -1,5 +1,7 @@
 package homework06;
 
+import java.util.Iterator;
+
 /**
  * Objects of this class represent a set of sortable values. The set has the following performace characteristics:
  * 
@@ -42,7 +44,10 @@ public class SpecialtySet<E extends Comparable<E>>
 	 */
 	public int size()
 	{
-		return 12345; // Stub
+		// We keep track of the size when doing operations, //
+		// So we don't have to iterate through the whole //
+		// list just to count how many items we have //
+		return size;
 	}
 
 	/**
@@ -61,6 +66,35 @@ public class SpecialtySet<E extends Comparable<E>>
 	 */
 	private void locatePosition(E data)
 	{
+		if (size == 0)
+		{
+			current = null;
+			last = null;
+			return;
+		}
+		current = head;
+		last = null;
+		while (current != null)
+		{
+			int compare = data.compareTo(current.data);
+
+			if (compare == 0)
+			{
+				return;
+			}
+			else if (compare > 1)
+			{
+				// Do nothing //
+			}
+			else if (compare < 0)
+			{
+				return;
+			}
+
+			last = current;
+			current = current.next;
+
+		}
 	}
 
 	/**
@@ -76,7 +110,20 @@ public class SpecialtySet<E extends Comparable<E>>
 	 */
 	public boolean contains(E data)
 	{
-		return false; // Stub
+		if (size == 0)
+			return false;
+
+		Node tempCurrent = head;
+		do
+		{
+			if (tempCurrent.data.equals(data))
+				return true;
+
+			tempCurrent = tempCurrent.next;
+		}
+		while (tempCurrent != null);
+
+		return false;
 	}
 
 	/**
@@ -92,6 +139,39 @@ public class SpecialtySet<E extends Comparable<E>>
 	 */
 	public void add(E data)
 	{
+		if (!contains(data))
+		{
+			if (size == 0)
+			{
+				head = new Node(data);
+				current = head;
+			}
+			else
+			{
+				locatePosition(data);
+				if (last == null && head != null)
+				{
+
+					Node tempHead = head;
+
+					head = new Node(data);
+					head.next = tempHead;
+				}
+				else
+				{
+
+					Node tempCurrent = current;
+
+					current = new Node(data);
+					current.next = tempCurrent;
+
+					if (last != null)
+						last.next = current;
+				}
+
+			}
+			size++;
+		}
 	}
 
 	/**
@@ -107,6 +187,17 @@ public class SpecialtySet<E extends Comparable<E>>
 	 */
 	public void remove(E data)
 	{
+		if (!contains(data))
+			return;
+		locatePosition(data);
+		if (current != null && current.data.equals(data))
+		{
+			if (last != null)
+				last.next = current.next;
+			current = last.next;
+			size--;
+		}
+		
 	}
 
 	/**
@@ -150,4 +241,5 @@ public class SpecialtySet<E extends Comparable<E>>
 			this.data = data;
 		}
 	}
+
 }
