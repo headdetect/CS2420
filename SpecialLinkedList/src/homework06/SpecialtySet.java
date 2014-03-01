@@ -68,32 +68,30 @@ public class SpecialtySet<E extends Comparable<E>>
 	{
 		if (size == 0)
 		{
-			current = null;
-			last = null;
 			return;
 		}
-		current = head;
-		last = null;
+		
+		// If is at the end of the list, move to the front //
+		if ((current == null && head != null) || data.compareTo(current.data) > 0)
+		{
+			current = head;
+			last = null;
+		}
+
 		while (current != null)
 		{
 			int compare = data.compareTo(current.data);
-
 			if (compare == 0)
 			{
 				return;
 			}
-			else if (compare > 1)
-			{
-				// Do nothing //
-			}
-			else if (compare < 0)
+			else if (compare > 0)
 			{
 				return;
 			}
 
 			last = current;
 			current = current.next;
-
 		}
 	}
 
@@ -113,17 +111,9 @@ public class SpecialtySet<E extends Comparable<E>>
 		if (size == 0)
 			return false;
 
-		Node tempCurrent = head;
-		do
-		{
-			if (tempCurrent.data.equals(data))
-				return true;
+		locatePosition(data);
 
-			tempCurrent = tempCurrent.next;
-		}
-		while (tempCurrent != null);
-
-		return false;
+		return current != null && current.data.equals(data);
 	}
 
 	/**
@@ -148,7 +138,6 @@ public class SpecialtySet<E extends Comparable<E>>
 			}
 			else
 			{
-				locatePosition(data);
 				if (last == null && head != null)
 				{
 
@@ -160,13 +149,10 @@ public class SpecialtySet<E extends Comparable<E>>
 				else
 				{
 
-					Node tempCurrent = current;
+					Node newNode = new Node(data);
 
-					current = new Node(data);
-					current.next = tempCurrent;
-
-					if (last != null)
-						last.next = current;
+					newNode.next = current;
+					last.next = newNode;
 				}
 
 			}
@@ -189,15 +175,22 @@ public class SpecialtySet<E extends Comparable<E>>
 	{
 		if (!contains(data))
 			return;
-		locatePosition(data);
-		if (current != null && current.data.equals(data))
+		if (current != null)
 		{
 			if (last != null)
 				last.next = current.next;
-			current = last.next;
+			current = current.next;
 			size--;
 		}
-		
+
+		if (size <= 0)
+		{
+			size = 0;
+			last = null;
+			current = null;
+			head = null;
+		}
+
 	}
 
 	/**
@@ -239,6 +232,12 @@ public class SpecialtySet<E extends Comparable<E>>
 		Node(E data)
 		{
 			this.data = data;
+		}
+
+		@Override
+		public String toString()
+		{
+			return data.toString();
 		}
 	}
 

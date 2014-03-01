@@ -138,7 +138,7 @@ public class SpecialtySetTest
         // If the specialty set is coded properly, a relatively small number of
         //   comparisons are done.
         
-        assertTrue ("Maximum comparison count test: ", TrackedInteger.comparisonCount <= 44536);
+        assertTrue ("Maximum comparison count test: " + TrackedInteger.comparisonCount + " <= 44536", TrackedInteger.comparisonCount <= 44536);
         
         // Uncomment if needed.
         
