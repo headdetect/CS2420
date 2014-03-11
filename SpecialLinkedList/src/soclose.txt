@@ -1,0 +1,1 @@
+I spent 20 hours or so trying to meet the cutoff value. Come to find out (30 mins before the assignment is due) that it is much easier than I had previously thought. But do to the circumstances, I couldn't meet it still. I was roughly 60 off. That being said, I could probably find somewhere to shave off 60 comparisons, but no time left. 

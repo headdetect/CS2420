@@ -66,33 +66,50 @@ public class SpecialtySet<E extends Comparable<E>>
 	 */
 	private void locatePosition(E data)
 	{
+		// The left is ...
+		// Negative = less than <
+		// Zero = equal =
+		// Positive = greater than >
+		// ... the right
 		if (size == 0)
 		{
 			return;
 		}
-		
-		// If is at the end of the list, move to the front //
-		if ((current == null && head != null) || data.compareTo(current.data) > 0)
+
+		int lastCompare;
+		if ((last != null && (lastCompare = last.data.compareTo(data)) >= 0))
 		{
+			if (lastCompare == 0)
+			{
+				next();
+				return;
+			}
 			current = head;
 			last = null;
 		}
 
 		while (current != null)
 		{
-			int compare = data.compareTo(current.data);
+			int compare = current.data.compareTo(data);
 			if (compare == 0)
+				return;
+			if (compare > 0)
 			{
+				while ((compare = data.compareTo(current.data)) > 0)
+				{
+					next();
+				}
 				return;
 			}
-			else if (compare > 0)
-			{
-				return;
-			}
-
-			last = current;
-			current = current.next;
+			next();
 		}
+
+	}
+
+	private void next()
+	{
+		last = current;
+		current = current.next;
 	}
 
 	/**
@@ -138,23 +155,29 @@ public class SpecialtySet<E extends Comparable<E>>
 			}
 			else
 			{
-				if (last == null && head != null)
+				if (head == current)
 				{
+					Node newNode = new Node(data);
 
-					Node tempHead = head;
-
-					head = new Node(data);
-					head.next = tempHead;
+					newNode.next = current;
+					last = null;
+					head = newNode;
+					current = newNode;
+				}
+				else if (last == null && head != null)
+				{
+					head.next = new Node(data);
+					current = head.next;
+					last = head;
 				}
 				else
 				{
-
 					Node newNode = new Node(data);
 
 					newNode.next = current;
 					last.next = newNode;
+					current = newNode;
 				}
-
 			}
 			size++;
 		}
@@ -179,7 +202,12 @@ public class SpecialtySet<E extends Comparable<E>>
 		{
 			if (last != null)
 				last.next = current.next;
+
+			// for some reason, not all references where updating //
+			if (current == head)
+				head = current.next;
 			current = current.next;
+
 			size--;
 		}
 
@@ -203,7 +231,18 @@ public class SpecialtySet<E extends Comparable<E>>
 	 */
 	boolean validate()
 	{
-		return false; // Stub
+		Node tempCurrent = head.next;
+		Node tempLast = head;
+		while (tempCurrent != null)
+		{
+			if (tempCurrent.data.compareTo(tempLast.data) > 0)
+				return false;
+
+			tempLast = tempCurrent;
+			tempCurrent = tempCurrent.next;
+
+		}
+		return true;
 	}
 
 	// An example of an inner class (a class within another object).
