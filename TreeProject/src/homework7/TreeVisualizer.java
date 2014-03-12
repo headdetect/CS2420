@@ -3,35 +3,24 @@ package homework7;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
-import java.io.File;
-import java.io.IOException;
 
 import javax.swing.JFrame;
 import javax.swing.JScrollPane;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
 
 public class TreeVisualizer
 {
 
 	public static void main(String[] args)
 	{
+		writeElements(generateRandomTree());
+		
+		
 		JFrame frame = new JFrame("Title?");
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setLayout(new BorderLayout());
 
 		TreeVisualizerPanel panel = new TreeVisualizerPanel();
-
-		/* The file structure is that of a XML type. No point in making my own tree structure that
-		 * takes an xml string and puts it into itself, when I can just use javax utils that contain a 
-		 * tree-est structure.
-		 */
 
 		JScrollPane pane = new JScrollPane(panel);
 		pane.setBackground(Color.YELLOW);
@@ -46,13 +35,28 @@ public class TreeVisualizer
 	}
 	
 	
-	static void WriteElements(Node node) {
-		System.out.println("\nCurrent Element :" + node.getNodeName());
+	static void writeElements(Node<String> node) {
+		System.out.println("\nCurrent Element :" + node.getValue());
 		
-		for (int i = 0; i < node.getChildNodes().getLength(); i++)
+		for (int i = 0; i < node.getChildren().size(); i++)
 		{
-			WriteElements(node.getChildNodes().item(i));
+			writeElements(node.getChildren().get(i));
 		}
+	}
+	
+	static Node<String> generateRandomTree() {
+		Node<String> root = new Node<String>("root");
+		for(int i = 0; i < 10; i++) {
+			int len = (int)(Math.random() * 10);
+			Node<String> parent = new Node<String>("" + i);
+			for(int j = 0; j < len; i++) {
+				Node<String> child = new Node<String>("" + j);
+				parent.getChildren().add(child);
+			}
+			root.getChildren().add(parent);
+		}
+		
+		return root;
 	}
 
 }
