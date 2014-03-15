@@ -1,6 +1,7 @@
 package homework7;
 
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.event.MouseEvent;
@@ -22,13 +23,33 @@ public class TreeVisualizerPanel extends JPanel implements MouseMotionListener, 
 
 	private JScrollPane enclosingPane;
 	private int lastMouseX, lastMouseY;
-	private boolean mSwitch;
-	private TreeModel mTree;
-
+	private Node<String> mTree;
+	
+	// Design Elements //
+	private static Font mFont;
+	private static Color mColorBlue;
+	private static Color mColorRed;
+	private static Color mColorOrange;
+	private static Color mColorPurple;
+	private static Color mColorGreen;
+	
 	public TreeVisualizerPanel()
 	{
 		addMouseListener(this);
 		addMouseMotionListener(this);
+		
+		mFont = new Font("Sans Serif", Font.BOLD, 13);
+		mColorBlue = new Color(0x33B5E5);
+		mColorRed = new Color(0xFF4444);
+		mColorOrange = new Color(0xFFBB33);
+		mColorPurple = new Color(0xAA66CC);
+		mColorGreen = new Color(0x99CC00);
+	}
+
+	public TreeVisualizerPanel(Node<String> tree)
+	{
+		this();
+		mTree = tree;
 	}
 
 	/**
@@ -51,29 +72,47 @@ public class TreeVisualizerPanel extends JPanel implements MouseMotionListener, 
 		int visibleWidth = g.getClipBounds().width;
 		int visibleHeight = g.getClipBounds().height;
 
-		// Compute a position on the panel that is above and to the left of the currently
-		// exposed view.
-
-		int firstX = Math.max(0, upperLeftX - upperLeftX % 100 - 100);
-		int firstY = Math.max(0, upperLeftY - upperLeftY % 100 - 100);
-
-		// Compute the last possible position of a coordinate in the visible space.
-
-		int lastX = (upperLeftX + visibleWidth) - (upperLeftX + visibleWidth) % 100 + 200;
-		int lastY = (upperLeftY + visibleHeight) - (upperLeftY + visibleHeight) % 100 + 200;
-
-		g.setColor(Color.BLACK);
+		g.setColor(Color.WHITE);
 		g.fillRect(upperLeftX, upperLeftY, visibleWidth, visibleHeight);
 
-	}
-	
-	private int cellSize = 100;
-	private int mWidth, mHeight;
-	
-	private void drawCell()
-	{
+		g.setFont(mFont);
 		
+		g.setColor(mColorBlue);
+		drawElements(mTree, g);
+		
+		
+		g.setColor(mColorPurple);
+		g.drawString("Height : " + mTree.getHeight(), 30, 30);
 	}
+
+	static int x, y = 60;
+
+	static void drawElements(Node<String> node, Graphics g)
+	{
+		if (node == null)
+			return;
+
+		if (node.isRoot())
+		{
+			x = 60;
+			y = 60;
+			g.drawString(node.getValue(), x, y);
+		}
+		else
+		{
+			g.drawString(node.getValue(), x, y);
+		}
+
+		for (int i = 0; i < node.getChildren().size(); i++)
+		{
+			x += 20;
+			y += 20;
+			drawElements(node.getChildren().get(i), g);
+		}
+		
+		x = Math.max(0, x - 20);
+	}
+
 	/**
 	 * Adjusts the scroll pane's view by an amount equal to the mouse motion.
 	 */
@@ -142,7 +181,7 @@ public class TreeVisualizerPanel extends JPanel implements MouseMotionListener, 
 	/**
 	 * @return the mTree
 	 */
-	public TreeModel getTree()
+	public Node<String> getTree()
 	{
 		return mTree;
 	}
@@ -151,7 +190,7 @@ public class TreeVisualizerPanel extends JPanel implements MouseMotionListener, 
 	 * @param mTree
 	 *            the mTree to set
 	 */
-	public void setTree(TreeModel mTree)
+	public void setTree(Node<String> mTree)
 	{
 		this.mTree = mTree;
 		repaint();

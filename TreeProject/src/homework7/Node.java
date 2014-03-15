@@ -7,21 +7,24 @@ public class Node<T>
 
 	private T value;
 	private ArrayList<Node<T>> children;
-	
-	public Node() {
+	private boolean isRoot;
+
+	public Node()
+	{
 		setChildren(new ArrayList<Node<T>>());
 	}
-	
-	public Node(T value) {
+
+	public Node(T value)
+	{
 		this.setValue(value);
 		this.setChildren(new ArrayList<Node<T>>());
 	}
-	
-	public Node(T value, ArrayList<Node<T>> children) {
+
+	public Node(T value, ArrayList<Node<T>> children)
+	{
 		this.setValue(value);
 		this.setChildren(children);
 	}
-	
 
 	/**
 	 * @return the children
@@ -32,7 +35,8 @@ public class Node<T>
 	}
 
 	/**
-	 * @param children the children to set
+	 * @param children
+	 *            the children to set
 	 */
 	public void setChildren(ArrayList<Node<T>> children)
 	{
@@ -48,24 +52,53 @@ public class Node<T>
 	}
 
 	/**
-	 * @param name the name to set
+	 * @param name
+	 *            the name to set
 	 */
 	public void setValue(T value)
 	{
 		this.value = value;
 	}
-	
-	
-	public ArrayList<Node<T>> getNodesOnLevel(int level) {
-		return null;
+
+	/**
+	 * @return the isRoot
+	 */
+	public boolean isRoot()
+	{
+		return isRoot;
 	}
-	
-	public ArrayList<Node<T>> getLeafs() {
-		return null;
+
+	/**
+	 * @param isRoot
+	 *            the isRoot to set
+	 */
+	public void setRoot(boolean isRoot)
+	{
+		this.isRoot = isRoot;
 	}
-	
-	public int getLastLevelIndex() {
-		return 0;
+
+	// Tools //
+	public int getHeight()
+	{
+		return calculateHeight(this);
 	}
-	
+
+	private int calculateHeight(Node<T> node)
+	{
+		if (node == null)
+		{
+			return 1;
+		}
+		else
+		{
+			int biggest = 0;
+			for (int i = 0; i < node.getChildren().size(); i++)
+			{
+				int calculatedHeight = calculateHeight(node.getChildren().get(i));
+				if (calculatedHeight > biggest)
+					biggest = calculatedHeight;
+			}
+			return 1 + biggest;
+		}
+	}
 }
