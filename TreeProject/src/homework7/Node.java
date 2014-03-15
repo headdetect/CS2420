@@ -7,6 +7,7 @@ public class Node<T>
 
 	private T value;
 	private ArrayList<Node<T>> children;
+	private Node<T> parent;
 	private boolean isRoot;
 
 	public Node()
@@ -21,6 +22,12 @@ public class Node<T>
 	}
 
 	public Node(T value, ArrayList<Node<T>> children)
+	{
+		this.setValue(value);
+		this.setChildren(children);
+	}
+	
+	public Node(Node<T> parent, T value, ArrayList<Node<T>> children)
 	{
 		this.setValue(value);
 		this.setChildren(children);
@@ -76,6 +83,22 @@ public class Node<T>
 	{
 		this.isRoot = isRoot;
 	}
+	
+	/**
+	 * @return the parent
+	 */
+	public Node<T> getParent()
+	{
+		return parent;
+	}
+
+	/**
+	 * @param parent the parent to set
+	 */
+	public void setParent(Node<T> parent)
+	{
+		this.parent = parent;
+	}
 
 	// Tools //
 	public int getHeight()
@@ -101,4 +124,6 @@ public class Node<T>
 			return 1 + biggest;
 		}
 	}
+
+
 }

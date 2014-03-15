@@ -75,6 +75,7 @@ public class TreeVisualizer
 			{
 				Node<String> child = new Node<String>("Layer 2: " + j);
 				parent.getChildren().add(child);
+				child.setParent(parent);
 
 				boolean makeChildren = (int)(Math.random() * 10) % 2 == 1;
 				if (makeChildren)
@@ -85,10 +86,12 @@ public class TreeVisualizer
 					{
 						Node<String> grandChild = new Node<String>("Layer 3: " + k);
 						child.getChildren().add(grandChild);
+						grandChild.setParent(child);
 					}
 				}
 			}
 			root.getChildren().add(parent);
+			parent.setParent(root);
 		}
 
 		return root;

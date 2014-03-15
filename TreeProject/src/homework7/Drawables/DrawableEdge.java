@@ -1,0 +1,25 @@
+package homework7.Drawables;
+
+import java.awt.Color;
+import java.awt.Graphics;
+
+public class DrawableEdge extends Drawable
+{
+	private DrawableNode from, to;
+
+	public DrawableEdge(DrawableNode nodeFrom, DrawableNode nodeTo)
+	{
+		this.from = nodeFrom;
+		this.to = nodeTo;
+	}
+
+	@Override
+	public void draw(Graphics g)
+	{
+		if(from == null || to == null) return;
+		g.setColor(Color.BLACK);
+		g.drawLine(from.getX(), from.getY(), to.getX(), to.getY());
+
+	}
+
+}

@@ -1,5 +1,8 @@
 package homework7;
 
+import homework7.Drawables.DrawableEdge;
+import homework7.Drawables.DrawableNode;
+
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
@@ -7,6 +10,9 @@ import java.awt.Point;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
 
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -24,7 +30,10 @@ public class TreeVisualizerPanel extends JPanel implements MouseMotionListener, 
 	private JScrollPane enclosingPane;
 	private int lastMouseX, lastMouseY;
 	private Node<String> mTree;
-	
+
+	private HashMap<Node<String>, DrawableNode> mNodes;
+	private ArrayList<DrawableEdge> mEdges;
+
 	// Design Elements //
 	private static Font mFont;
 	private static Color mColorBlue;
@@ -32,24 +41,30 @@ public class TreeVisualizerPanel extends JPanel implements MouseMotionListener, 
 	private static Color mColorOrange;
 	private static Color mColorPurple;
 	private static Color mColorGreen;
-	
+	private static Color[] colors;
+
 	public TreeVisualizerPanel()
 	{
 		addMouseListener(this);
 		addMouseMotionListener(this);
-		
+
+		mNodes = new HashMap<Node<String>, DrawableNode>();
+		mEdges = new ArrayList<DrawableEdge>();
+
 		mFont = new Font("Sans Serif", Font.BOLD, 13);
 		mColorBlue = new Color(0x33B5E5);
 		mColorRed = new Color(0xFF4444);
 		mColorOrange = new Color(0xFFBB33);
 		mColorPurple = new Color(0xAA66CC);
 		mColorGreen = new Color(0x99CC00);
+
+		colors = new Color[] { mColorBlue, mColorPurple, mColorGreen, mColorOrange, mColorRed };
 	}
 
 	public TreeVisualizerPanel(Node<String> tree)
 	{
 		this();
-		mTree = tree;
+		setTree(tree);
 	}
 
 	/**
@@ -76,42 +91,30 @@ public class TreeVisualizerPanel extends JPanel implements MouseMotionListener, 
 		g.fillRect(upperLeftX, upperLeftY, visibleWidth, visibleHeight);
 
 		g.setFont(mFont);
-		
-		g.setColor(mColorBlue);
-		drawElements(mTree, g);
-		
-		
+
+		for (int i = 0; i < mEdges.size(); i++)
+		{
+			g.setColor(Color.BLACK);
+			mEdges.get(i).draw(g);
+		}
+
+		Collection<DrawableNode> nodes = mNodes.values();
+		for(DrawableNode node : nodes)
+		{
+			g.setColor(Color.BLACK);
+			node.draw(g);
+		}
+
 		g.setColor(mColorPurple);
 		g.drawString("Height : " + mTree.getHeight(), 30, 30);
 	}
 
-	static int x, y = 60;
+	private static int NODE_SIZE = 60;
+	private static int PADDING = 0;
 
-	static void drawElements(Node<String> node, Graphics g)
-	{
-		if (node == null)
-			return;
-
-		if (node.isRoot())
-		{
-			x = 60;
-			y = 60;
-			g.drawString(node.getValue(), x, y);
-		}
-		else
-		{
-			g.drawString(node.getValue(), x, y);
-		}
-
-		for (int i = 0; i < node.getChildren().size(); i++)
-		{
-			x += 20;
-			y += 20;
-			drawElements(node.getChildren().get(i), g);
-		}
-		
-		x = Math.max(0, x - 20);
-	}
+	private int currX, currY = NODE_SIZE;
+	private int parentX, parentY;
+	private int colorIteration = 0;
 
 	/**
 	 * Adjusts the scroll pane's view by an amount equal to the mouse motion.
@@ -193,6 +196,58 @@ public class TreeVisualizerPanel extends JPanel implements MouseMotionListener, 
 	public void setTree(Node<String> mTree)
 	{
 		this.mTree = mTree;
+
+		recurseLoad(mTree);
+
 		repaint();
+	}
+
+	DrawableNode mParentNode;
+
+	void recurseLoad(Node<String> node)
+	{
+		if (node == null)
+			return;
+
+		if (node.isRoot())
+		{
+			colorIteration = 0;
+			currX = NODE_SIZE;
+			currY = NODE_SIZE;
+
+			parentX = currX;
+			parentY = currY;
+		}
+
+		DrawableNode drawNode = new DrawableNode(currX, currY, node.getValue(), colors[colorIteration % 5]);
+		mNodes.put(node, drawNode);
+
+		DrawableEdge drawEdge = new DrawableEdge(mParentNode, drawNode);
+		mEdges.add(drawEdge);
+
+		if (node.getChildren().size() > 0)
+		{
+			mParentNode = drawNode;
+			colorIteration++;
+
+			for (int i = 0; i < node.getChildren().size(); i++)
+			{
+				currX += NODE_SIZE;
+				currY += NODE_SIZE;
+				recurseLoad(node.getChildren().get(i));
+			}
+
+			if (node.getParent() != null)
+				mParentNode = mNodes.get(node.getParent());
+			colorIteration--;
+		}
+
+		currX = Math.max(0, currX - NODE_SIZE);
+
+	}
+
+	void drawElements(Node<String> node, Graphics g)
+	{
+
 	}
 }
