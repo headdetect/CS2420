@@ -3,6 +3,7 @@ package homework7;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.io.IOException;
 
 import javax.swing.JFrame;
 import javax.swing.JScrollPane;
@@ -10,12 +11,14 @@ import javax.swing.JScrollPane;
 public class TreeVisualizer
 {
 
-	public static void main(String[] args)
+	public static void main(String[] args) throws IOException
 	{
 		JFrame frame = new JFrame("Title?");
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setLayout(new BorderLayout());
 
+		Node<String> nodes = TreeReader.readTreeFromFile("test.tree");
+		
 		TreeVisualizerPanel panel = new TreeVisualizerPanel(generateRandomTree());
 		panel.setMinimumSize(new Dimension(10000, 10000));
 		panel.setPreferredSize(new Dimension(10000, 10000));
