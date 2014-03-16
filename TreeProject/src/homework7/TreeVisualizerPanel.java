@@ -6,7 +6,9 @@ import homework7.Drawables.DrawableNode;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.Point;
+import java.awt.RenderingHints;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
@@ -81,32 +83,36 @@ public class TreeVisualizerPanel extends JPanel implements MouseMotionListener, 
 	@Override
 	public void paint(Graphics g)
 	{
+		Graphics2D g2d = (Graphics2D) g;
+		
+		g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+		//g2d.setRenderingHints(g,Graphics2D.ANTIALIAS_ON);
 
 		int upperLeftX = g.getClipBounds().x;
 		int upperLeftY = g.getClipBounds().y;
 		int visibleWidth = g.getClipBounds().width;
 		int visibleHeight = g.getClipBounds().height;
 
-		g.setColor(Color.WHITE);
-		g.fillRect(upperLeftX, upperLeftY, visibleWidth, visibleHeight);
+		g2d.setColor(Color.WHITE);
+		g2d.fillRect(upperLeftX, upperLeftY, visibleWidth, visibleHeight);
 
-		g.setFont(mFont);
+		g2d.setFont(mFont);
 
 		for (int i = 0; i < mEdges.size(); i++)
 		{
-			g.setColor(Color.BLACK);
-			mEdges.get(i).draw(g);
+			g2d.setColor(Color.BLACK);
+			mEdges.get(i).draw(g2d);
 		}
 
 		Collection<DrawableNode> nodes = mNodes.values();
 		for(DrawableNode node : nodes)
 		{
-			g.setColor(Color.BLACK);
-			node.draw(g);
+			g2d.setColor(Color.BLACK);
+			node.draw(g2d);
 		}
 
-		g.setColor(mColorPurple);
-		g.drawString("Height : " + mTree.getHeight(), 30, 30);
+		g2d.setColor(mColorPurple);
+		g2d.drawString("Height : " + mTree.getHeight(), 30, 30);
 	}
 
 	private static int NODE_SIZE = 60;

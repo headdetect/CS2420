@@ -19,7 +19,7 @@ public class TreeVisualizer
 
 		Node<String> nodes = TreeReader.readTreeFromFile("test.tree");
 		
-		TreeVisualizerPanel panel = new TreeVisualizerPanel(generateRandomTree());
+		TreeVisualizerPanel panel = new TreeVisualizerPanel(nodes);
 		panel.setMinimumSize(new Dimension(10000, 10000));
 		panel.setPreferredSize(new Dimension(10000, 10000));
 

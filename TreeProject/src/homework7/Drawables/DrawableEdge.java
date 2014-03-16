@@ -1,7 +1,7 @@
 package homework7.Drawables;
 
 import java.awt.Color;
-import java.awt.Graphics;
+import java.awt.Graphics2D;
 
 public class DrawableEdge extends Drawable
 {
@@ -14,7 +14,7 @@ public class DrawableEdge extends Drawable
 	}
 
 	@Override
-	public void draw(Graphics g)
+	public void draw(Graphics2D g)
 	{
 		if(from == null || to == null) return;
 		g.setColor(Color.BLACK);
