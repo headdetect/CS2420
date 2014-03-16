@@ -20,16 +20,12 @@ public class TreeVisualizer
 		Node<String> nodes = TreeReader.readTreeFromFile("test.tree");
 		
 		TreeVisualizerPanel panel = new TreeVisualizerPanel(nodes);
-		panel.setMinimumSize(new Dimension(10000, 10000));
-		panel.setPreferredSize(new Dimension(10000, 10000));
 
 		JScrollPane pane = new JScrollPane(panel);
-		pane.setBackground(Color.YELLOW);
 		panel.setEnclosingPane(pane);
 
 		pane.setPreferredSize(new Dimension(500, 500));
 		frame.add(pane, BorderLayout.CENTER);
-		frame.add(pane);
 
 		frame.pack();
 		frame.setVisible(true);
