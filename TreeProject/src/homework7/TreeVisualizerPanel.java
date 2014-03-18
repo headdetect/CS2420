@@ -85,9 +85,9 @@ public class TreeVisualizerPanel extends JPanel implements MouseMotionListener, 
 	public void paint(Graphics g)
 	{
 		Graphics2D g2d = (Graphics2D) g;
-		
+
 		g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-		//g2d.setRenderingHints(g,Graphics2D.ANTIALIAS_ON);
+		// g2d.setRenderingHints(g,Graphics2D.ANTIALIAS_ON);
 
 		int upperLeftX = g.getClipBounds().x;
 		int upperLeftY = g.getClipBounds().y;
@@ -106,7 +106,7 @@ public class TreeVisualizerPanel extends JPanel implements MouseMotionListener, 
 		}
 
 		Collection<DrawableNode> nodes = mNodes.values();
-		for(DrawableNode node : nodes)
+		for (DrawableNode node : nodes)
 		{
 			g2d.setColor(Color.BLACK);
 			node.draw(g2d);
@@ -115,8 +115,6 @@ public class TreeVisualizerPanel extends JPanel implements MouseMotionListener, 
 		g2d.setColor(mColorPurple);
 		g2d.drawString("Height : " + mTree.getHeight(), 30, 30);
 	}
-
-	
 
 	/**
 	 * Adjusts the scroll pane's view by an amount equal to the mouse motion.
@@ -134,11 +132,9 @@ public class TreeVisualizerPanel extends JPanel implements MouseMotionListener, 
 
 		JViewport view = enclosingPane.getViewport();
 		Point pos = view.getViewPosition();
-		
-		
+
 		// Give a little room because of the scroll bars //
 		this.scrollRectToVisible(new Rectangle(Math.max(-20, Math.min(getWidth(), pos.x - deltaX)), Math.max(-10, Math.min(getHeight(), pos.y - deltaY)), 500, 500));
-		
 
 		// Keep track of the last mouse location. Note: Because we moved
 		// the view, the logical location of the mouse moved an equal amount
@@ -204,29 +200,28 @@ public class TreeVisualizerPanel extends JPanel implements MouseMotionListener, 
 		this.mTree = mTree;
 		mNodes.clear();
 		mEdges.clear();
-		
 
 		recurseLoad(mTree);
-		
+
 		this.setMinimumSize(new Dimension(preferredWidth, preferredHeight));
 		this.setPreferredSize(new Dimension(preferredWidth, preferredHeight));
-		
+
 		repaint();
-		
-		
+
 	}
-	
-	public void resetLayout() {
+
+	public void resetLayout()
+	{
 		this.scrollRectToVisible(new Rectangle(0, 0, 500, 500));
 	}
 
 	private int preferredWidth, preferredHeight;
-	
+
 	private static int NODE_SIZE = 80;
 	private static int STARTING_POS = 100;
 	private int currX, currY = STARTING_POS;
 	private int colorIteration = 0;
-	
+
 	DrawableNode mParentNode;
 
 	void recurseLoad(Node<String> node)
@@ -251,7 +246,7 @@ public class TreeVisualizerPanel extends JPanel implements MouseMotionListener, 
 		{
 			mParentNode = drawNode;
 			colorIteration++;
-			
+
 			updatePreferred();
 
 			for (int i = 0; i < node.getChildren().size(); i++)
@@ -259,7 +254,7 @@ public class TreeVisualizerPanel extends JPanel implements MouseMotionListener, 
 				currX += NODE_SIZE;
 				currY += NODE_SIZE;
 				updatePreferred();
-				
+
 				recurseLoad(node.getChildren().get(i));
 			}
 
@@ -270,12 +265,13 @@ public class TreeVisualizerPanel extends JPanel implements MouseMotionListener, 
 
 		currX = Math.max(0, currX - NODE_SIZE);
 	}
-	
-	void updatePreferred() {
-		if(currX + NODE_SIZE + 20 > preferredWidth)
+
+	void updatePreferred()
+	{
+		if (currX + NODE_SIZE + 20 > preferredWidth)
 			preferredWidth = currX + NODE_SIZE + 20; // Just a little padding //
-		
-		if(currY + NODE_SIZE + 20 > preferredHeight)
+
+		if (currY + NODE_SIZE + 20 > preferredHeight)
 			preferredHeight = currY + NODE_SIZE + 20; // Just a little padding //
 	}
 }

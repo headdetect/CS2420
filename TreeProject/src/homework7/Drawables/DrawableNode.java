@@ -34,11 +34,11 @@ public class DrawableNode extends Drawable
 		FontMetrics fontMetrics = g.getFontMetrics();
 		int textWidth = fontMetrics.stringWidth(text);
 		int textHeight = fontMetrics.getHeight();
-		
+
 		int nSize = NODE_SIZE;
 		int nX = x - nSize / 2;
 		int nY = y - nSize / 2;
-		
+
 		g.fillOval(nX, nY, nSize, nSize);
 
 		g.setColor(Color.WHITE);

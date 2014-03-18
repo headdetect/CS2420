@@ -26,7 +26,7 @@ public class Node<T>
 		this.setValue(value);
 		this.setChildren(children);
 	}
-	
+
 	public Node(Node<T> parent, T value, ArrayList<Node<T>> children)
 	{
 		this.setValue(value);
@@ -83,7 +83,7 @@ public class Node<T>
 	{
 		this.isRoot = isRoot;
 	}
-	
+
 	/**
 	 * @return the parent
 	 */
@@ -93,7 +93,8 @@ public class Node<T>
 	}
 
 	/**
-	 * @param parent the parent to set
+	 * @param parent
+	 *            the parent to set
 	 */
 	public void setParent(Node<T> parent)
 	{
@@ -124,6 +125,5 @@ public class Node<T>
 			return 1 + biggest;
 		}
 	}
-
 
 }

@@ -64,9 +64,10 @@ public class TreeVisualizer
 			final JFileChooser fc = new JFileChooser();
 			int returnVal = fc.showOpenDialog(panel);
 
-	        if (returnVal == JFileChooser.APPROVE_OPTION) {
-	            File file = fc.getSelectedFile();
-	            try
+			if (returnVal == JFileChooser.APPROVE_OPTION)
+			{
+				File file = fc.getSelectedFile();
+				try
 				{
 					panel.setTree(TreeReader.readTreeFromFile(file));
 				}
@@ -74,11 +75,11 @@ public class TreeVisualizer
 				{
 					e.printStackTrace();
 				}
-	        }
+			}
 		}
 
 	};
-	
+
 	private static final ActionListener mCloseActionListener = new ActionListener()
 	{
 
@@ -87,7 +88,7 @@ public class TreeVisualizer
 		{
 			// Probably not the best way to close the program //
 			System.exit(0);
-	        
+
 		}
 
 	};
