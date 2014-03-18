@@ -3,25 +3,49 @@ package homework7;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.File;
 import java.io.IOException;
 
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
 import javax.swing.JScrollPane;
 
 public class TreeVisualizer
 {
+	static JMenuBar menuBar;
+	static JMenuItem fileItem, loadMenu, closeMenu;
+	static JFrame frame;
+	static TreeVisualizerPanel panel;
+	static JScrollPane pane;
 
 	public static void main(String[] args) throws IOException
 	{
-		JFrame frame = new JFrame("Title?");
+		menuBar = new JMenuBar();
+		fileItem = new JMenu("File");
+		loadMenu = new JMenuItem("Load Tree");
+		loadMenu.addActionListener(mFileOpenActionListener);
+		closeMenu = new JMenuItem("Close");
+		closeMenu.addActionListener(mCloseActionListener);
+
+		fileItem.add(loadMenu);
+		fileItem.add(closeMenu);
+		menuBar.add(fileItem);
+
+		frame = new JFrame("test.tree");
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setLayout(new BorderLayout());
+		frame.setJMenuBar(menuBar);
 
 		Node<String> nodes = TreeReader.readTreeFromFile("test.tree");
-		
-		TreeVisualizerPanel panel = new TreeVisualizerPanel(nodes);
 
-		JScrollPane pane = new JScrollPane(panel);
+		panel = new TreeVisualizerPanel(nodes);
+
+		pane = new JScrollPane(panel);
 		panel.setEnclosingPane(pane);
 
 		pane.setPreferredSize(new Dimension(500, 500));
@@ -31,35 +55,42 @@ public class TreeVisualizer
 		frame.setVisible(true);
 	}
 
-	static int indentStatus = 0;
-
-	static void writeElements(Node<String> node)
+	private static final ActionListener mFileOpenActionListener = new ActionListener()
 	{
-		if (node.isRoot())
+
+		@Override
+		public void actionPerformed(ActionEvent arg0)
 		{
-			indentStatus = 0;
-			System.out.println(node.getValue());
-		}
-		else
-		{
-			System.out.println(getIndents() + node.getValue());
+			final JFileChooser fc = new JFileChooser();
+			int returnVal = fc.showOpenDialog(panel);
+
+	        if (returnVal == JFileChooser.APPROVE_OPTION) {
+	            File file = fc.getSelectedFile();
+	            try
+				{
+					panel.setTree(TreeReader.readTreeFromFile(file));
+				}
+				catch (IOException e)
+				{
+					e.printStackTrace();
+				}
+	        }
 		}
 
-		for (int i = 0; i < node.getChildren().size(); i++)
-		{
-			indentStatus++;
-			writeElements(node.getChildren().get(i));
-		}
-		indentStatus--;
-	}
-
-	private static String getIndents()
+	};
+	
+	private static final ActionListener mCloseActionListener = new ActionListener()
 	{
-		StringBuilder builder = new StringBuilder();
-		for (int i = 0; i < indentStatus; i++)
-			builder.append('\t');
-		return builder.toString();
-	}
+
+		@Override
+		public void actionPerformed(ActionEvent arg0)
+		{
+			// Probably not the best way to close the program //
+			System.exit(0);
+	        
+		}
+
+	};
 
 	static Node<String> generateRandomTree()
 	{
@@ -76,12 +107,12 @@ public class TreeVisualizer
 				parent.getChildren().add(child);
 				child.setParent(parent);
 
-				boolean makeChildren = (int)(Math.random() * 10) % 2 == 1;
+				boolean makeChildren = (int) (Math.random() * 10) % 2 == 1;
 				if (makeChildren)
 				{
 					int plen = (int) (Math.random() * 10 + 1);
 					int pskip = (int) (Math.random() * 3 + 1);
-					for(int k = 0; k < plen; k += pskip)
+					for (int k = 0; k < plen; k += pskip)
 					{
 						Node<String> grandChild = new Node<String>("Layer 3: " + k);
 						child.getChildren().add(grandChild);

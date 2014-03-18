@@ -202,19 +202,27 @@ public class TreeVisualizerPanel extends JPanel implements MouseMotionListener, 
 	public void setTree(Node<String> mTree)
 	{
 		this.mTree = mTree;
+		mNodes.clear();
+		mEdges.clear();
+		
 
 		recurseLoad(mTree);
 		
 		this.setMinimumSize(new Dimension(preferredWidth, preferredHeight));
 		this.setPreferredSize(new Dimension(preferredWidth, preferredHeight));
 		
-		
 		repaint();
+		
+		
+	}
+	
+	public void resetLayout() {
+		this.scrollRectToVisible(new Rectangle(0, 0, 500, 500));
 	}
 
 	private int preferredWidth, preferredHeight;
 	
-	private static int NODE_SIZE = 60;
+	private static int NODE_SIZE = 80;
 	private static int STARTING_POS = 100;
 	private int currX, currY = STARTING_POS;
 	private int colorIteration = 0;

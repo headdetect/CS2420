@@ -9,7 +9,6 @@ import java.io.InputStreamReader;
 import java.nio.charset.Charset;
 
 public class TreeReader {
-	;
 
 	public static Node<String> readTreeFromFile(String file) throws IOException {
 		return readTreeFromFile(new File(file));
