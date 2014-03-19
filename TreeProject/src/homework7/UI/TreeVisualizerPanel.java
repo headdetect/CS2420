@@ -1,5 +1,6 @@
-package homework7;
+package homework7.UI;
 
+import homework7.Data.Node;
 import homework7.Drawables.DrawableEdge;
 import homework7.Drawables.DrawableNode;
 
@@ -22,21 +23,37 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JViewport;
 
+/**
+ * Takes in a Node, then draws it on itself.
+ */
 public class TreeVisualizerPanel extends JPanel implements MouseMotionListener, MouseListener
 {
-
+	
+	// ===========================================================
+	// Constants
+	// ===========================================================
+	
 	/**
 	 * Generated serial version.
 	 */
 	private static final long serialVersionUID = 4536105668603835030L;
+	
+	private static int NODE_SIZE = 80;
+	private static int STARTING_POS = 100;
 
+	// ===========================================================
+	// Fields
+	// ===========================================================
+	
 	private JScrollPane enclosingPane;
 	private int lastMouseX, lastMouseY;
-	private Node<String> mTree;
-
+	
 	private HashMap<Node<String>, DrawableNode> mNodes;
 	private ArrayList<DrawableEdge> mEdges;
 
+	private Node<String> mTree;
+	
+	
 	// Design Elements //
 	private static Font mFont;
 	private static Color mColorBlue;
@@ -45,15 +62,25 @@ public class TreeVisualizerPanel extends JPanel implements MouseMotionListener, 
 	private static Color mColorPurple;
 	private static Color mColorGreen;
 	private static Color[] colors;
+	
+	// Drawing Nodes //
+	
+	private int preferredWidth, preferredHeight;
 
-	public TreeVisualizerPanel()
-	{
-		addMouseListener(this);
-		addMouseMotionListener(this);
+	private int currX = STARTING_POS, currY = STARTING_POS;
+	
+	private int currentColorIteration = 0;
 
-		mNodes = new HashMap<Node<String>, DrawableNode>();
-		mEdges = new ArrayList<DrawableEdge>();
+	/* Keeps track of the current parent node so we can backtrack */
+	private DrawableNode mParentNode;
 
+
+	// ===========================================================
+	// Constructors
+	// ===========================================================
+	
+	/** Static Constructor **/
+	static {
 		mFont = new Font("Sans Serif", Font.BOLD, 13);
 		mColorBlue = new Color(0x33B5E5);
 		mColorRed = new Color(0xFF4444);
@@ -63,31 +90,88 @@ public class TreeVisualizerPanel extends JPanel implements MouseMotionListener, 
 
 		colors = new Color[] { mColorBlue, mColorPurple, mColorGreen, mColorOrange, mColorRed };
 	}
+	
+	/**
+	 * Instantiates a new tree visualizer panel.
+	 */
+	public TreeVisualizerPanel()
+	{
+		addMouseListener(this);
+		addMouseMotionListener(this);
 
+		mNodes = new HashMap<Node<String>, DrawableNode>();
+		mEdges = new ArrayList<DrawableEdge>();
+		mTree = new Node<String>();
+	}
+
+	/**
+	 * Instantiates a new tree visualizer panel.
+	 *
+	 * @param tree the tree
+	 */
 	public TreeVisualizerPanel(Node<String> tree)
 	{
 		this();
 		setTree(tree);
 	}
 
+	// ===========================================================
+	// Getter & Setter
+	// ===========================================================
+	
 	/**
 	 * Allows the main method to set an instance variable in this panel.
-	 * 
-	 * @param enclosingPane
-	 *            a JScrollPane object that is controlling the view of this panel
+	 *
+	 * @param pane the new enclosing pane
 	 */
 	public void setEnclosingPane(JScrollPane pane)
 	{
 		enclosingPane = pane;
 	}
+	
+	/**
+	 * Gets the tree.
+	 *
+	 * @return the mTree
+	 */
+	public Node<String> getTree()
+	{
+		return mTree;
+	}
 
+	/**
+	 * Sets the tree.
+	 *
+	 * @param mTree            the mTree to set
+	 */
+	public void setTree(Node<String> mTree)
+	{
+		this.mTree = mTree;
+		mNodes.clear();
+		mEdges.clear();
+
+		recurseLoad(mTree);
+
+		this.setMinimumSize(new Dimension(preferredWidth, preferredHeight));
+		this.setPreferredSize(new Dimension(preferredWidth, preferredHeight));
+
+		revalidate();
+		repaint();
+
+	}
+
+	// ===========================================================
+	// Methods for/from SuperClass/Interfaces
+	// ===========================================================
+	
 	@Override
 	public void paint(Graphics g)
 	{
 		Graphics2D g2d = (Graphics2D) g;
 
+		// Turn on anti aliasing so we can get some smoothness up in here //
 		g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-		// g2d.setRenderingHints(g,Graphics2D.ANTIALIAS_ON);
+		g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 
 		int upperLeftX = g.getClipBounds().x;
 		int upperLeftY = g.getClipBounds().y;
@@ -115,9 +199,11 @@ public class TreeVisualizerPanel extends JPanel implements MouseMotionListener, 
 		g2d.setColor(mColorPurple);
 		g2d.drawString("Height : " + mTree.getHeight(), 30, 30);
 	}
-
+	
 	/**
 	 * Adjusts the scroll pane's view by an amount equal to the mouse motion.
+	 *
+	 * @param e the e
 	 */
 	public void mouseDragged(MouseEvent e)
 	{
@@ -152,6 +238,8 @@ public class TreeVisualizerPanel extends JPanel implements MouseMotionListener, 
 
 	/**
 	 * Keeps track of the last mouse position.
+	 *
+	 * @param e the e
 	 */
 	public void mousePressed(MouseEvent e)
 	{
@@ -160,9 +248,9 @@ public class TreeVisualizerPanel extends JPanel implements MouseMotionListener, 
 		lastMouseX = e.getX();
 		lastMouseY = e.getY();
 	}
-
-	// Unused event handlers
-
+	
+	// ------- Unused Events ------- //
+	
 	public void mouseMoved(MouseEvent e)
 	{
 	}
@@ -183,47 +271,47 @@ public class TreeVisualizerPanel extends JPanel implements MouseMotionListener, 
 	{
 	}
 
+	// ===========================================================
+	// Methods
+	// ===========================================================
+	
 	/**
-	 * @return the mTree
+	 * Reset layout to root node.
 	 */
-	public Node<String> getTree()
-	{
-		return mTree;
-	}
-
-	/**
-	 * @param mTree
-	 *            the mTree to set
-	 */
-	public void setTree(Node<String> mTree)
-	{
-		this.mTree = mTree;
-		mNodes.clear();
-		mEdges.clear();
-
-		recurseLoad(mTree);
-
-		this.setMinimumSize(new Dimension(preferredWidth, preferredHeight));
-		this.setPreferredSize(new Dimension(preferredWidth, preferredHeight));
-
-		repaint();
-
-	}
-
 	public void resetLayout()
 	{
 		this.scrollRectToVisible(new Rectangle(0, 0, 500, 500));
 	}
 
-	private int preferredWidth, preferredHeight;
+	// ===========================================================
+	// Inner and Anonymous Classes
+	// ===========================================================
 
-	private static int NODE_SIZE = 80;
-	private static int STARTING_POS = 100;
-	private int currX, currY = STARTING_POS;
-	private int colorIteration = 0;
+	
 
-	DrawableNode mParentNode;
+	
 
+
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	/**
+	 * Recurse load.
+	 *
+	 * @param node the node
+	 */
 	void recurseLoad(Node<String> node)
 	{
 		if (node == null)
@@ -231,12 +319,12 @@ public class TreeVisualizerPanel extends JPanel implements MouseMotionListener, 
 
 		if (node.isRoot())
 		{
-			colorIteration = 0;
+			currentColorIteration = 0;
 			currX = STARTING_POS;
 			currY = STARTING_POS;
 		}
 
-		DrawableNode drawNode = new DrawableNode(currX, currY, node.getValue(), colors[colorIteration % 5]);
+		DrawableNode drawNode = new DrawableNode(currX, currY, node.getValue(), colors[currentColorIteration % 5]);
 		mNodes.put(node, drawNode);
 
 		DrawableEdge drawEdge = new DrawableEdge(mParentNode, drawNode);
@@ -245,7 +333,7 @@ public class TreeVisualizerPanel extends JPanel implements MouseMotionListener, 
 		if (node.getChildren().size() > 0)
 		{
 			mParentNode = drawNode;
-			colorIteration++;
+			currentColorIteration++;
 
 			updatePreferred();
 
@@ -260,12 +348,15 @@ public class TreeVisualizerPanel extends JPanel implements MouseMotionListener, 
 
 			if (node.getParent() != null)
 				mParentNode = mNodes.get(node.getParent());
-			colorIteration--;
+			currentColorIteration--;
 		}
 
 		currX = Math.max(0, currX - NODE_SIZE);
 	}
 
+	/**
+	 * Update preferred.
+	 */
 	void updatePreferred()
 	{
 		if (currX + NODE_SIZE + 20 > preferredWidth)

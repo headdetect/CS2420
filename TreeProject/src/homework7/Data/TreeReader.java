@@ -1,4 +1,4 @@
-package homework7;
+package homework7.Data;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -8,14 +8,31 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.Charset;
 
+/**
+ * Reads a .tree file and gives back a tree.
+ */
 public class TreeReader
 {
 
+	/**
+	 * Read tree from file.
+	 *
+	 * @param file the file
+	 * @return the node
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 */
 	public static Node<String> readTreeFromFile(String file) throws IOException
 	{
 		return readTreeFromFile(new File(file));
 	}
 
+	/**
+	 * Read tree from file.
+	 *
+	 * @param file the file
+	 * @return the node
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 */
 	public static Node<String> readTreeFromFile(File file) throws IOException
 	{
 		if (!file.exists())
@@ -83,6 +100,6 @@ public class TreeReader
 				reader.close();
 		}
 
-		return parent;
+		return parent == null ? new Node<String>() : parent;
 	}
 }

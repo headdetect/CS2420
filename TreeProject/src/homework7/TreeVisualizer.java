@@ -1,7 +1,10 @@
 package homework7;
 
+import homework7.Data.Node;
+import homework7.Data.TreeReader;
+import homework7.UI.TreeVisualizerPanel;
+
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -13,16 +16,108 @@ import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 
+/**
+ * The Class TreeVisualizer.
+ */
 public class TreeVisualizer
 {
+
+	// ===========================================================
+	// Constants
+	// ===========================================================
+
+	// ===========================================================
+	// Fields
+	// ===========================================================
+
 	static JMenuBar menuBar;
-	static JMenuItem fileItem, loadMenu, closeMenu;
+
+	static JMenuItem fileItem, loadMenu, closeMenu, viewItem, resetViewMenu;
+
 	static JFrame frame;
+
 	static TreeVisualizerPanel panel;
+
 	static JScrollPane pane;
 
+	/** The File Open Action Listener. */
+	private static final ActionListener mFileOpenActionListener = new ActionListener()
+	{
+
+		@Override
+		public void actionPerformed(ActionEvent arg0)
+		{
+			final JFileChooser fc = new JFileChooser();
+			int returnVal = fc.showOpenDialog(panel);
+
+			if (returnVal == JFileChooser.APPROVE_OPTION)
+			{
+				File file = fc.getSelectedFile();
+				try
+				{
+					Node<String> nodes = TreeReader.readTreeFromFile(file);
+					if (nodes == null)
+					{
+						JOptionPane.showMessageDialog(panel, "Is not a valid tree file");
+						return;
+					}
+					panel.setTree(nodes);
+				}
+				catch (IOException e)
+				{
+					JOptionPane.showMessageDialog(panel, "File could not be opened");
+				}
+				catch (Exception e)
+				{
+					JOptionPane.showMessageDialog(panel, "Is not a valid tree file");
+				}
+			}
+		}
+
+	};
+
+	/** The Close Action Listener. */
+	private static final ActionListener mCloseActionListener = new ActionListener()
+	{
+
+		@Override
+		public void actionPerformed(ActionEvent arg0)
+		{
+			// Probably not the best way to close the program //
+			System.exit(0);
+
+		}
+
+	};
+
+	/** The Reset View Action Listener. */
+	private static final ActionListener mResetViewActionListener = new ActionListener()
+	{
+
+		@Override
+		public void actionPerformed(ActionEvent e)
+		{
+			if (panel != null)
+				panel.resetLayout();
+
+		}
+	};
+
+	// ===========================================================
+	// Constructors
+	// ===========================================================
+
+	/**
+	 * The main method. Acts like the program constructor.
+	 * 
+	 * @param args
+	 *            the arguments
+	 * @throws IOException
+	 *             Signals that an I/O exception has occurred.
+	 */
 	public static void main(String[] args) throws IOException
 	{
 		menuBar = new JMenuBar();
@@ -32,9 +127,17 @@ public class TreeVisualizer
 		closeMenu = new JMenuItem("Close");
 		closeMenu.addActionListener(mCloseActionListener);
 
+		viewItem = new JMenu("View");
+		resetViewMenu = new JMenuItem("Reset View");
+		resetViewMenu.addActionListener(mResetViewActionListener);
+
 		fileItem.add(loadMenu);
 		fileItem.add(closeMenu);
+
+		viewItem.add(resetViewMenu);
+
 		menuBar.add(fileItem);
+		menuBar.add(viewItem);
 
 		frame = new JFrame("test.tree");
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -55,77 +158,20 @@ public class TreeVisualizer
 		frame.setVisible(true);
 	}
 
-	private static final ActionListener mFileOpenActionListener = new ActionListener()
-	{
+	// ===========================================================
+	// Getter & Setter
+	// ===========================================================
 
-		@Override
-		public void actionPerformed(ActionEvent arg0)
-		{
-			final JFileChooser fc = new JFileChooser();
-			int returnVal = fc.showOpenDialog(panel);
+	// ===========================================================
+	// Methods for/from SuperClass/Interfaces
+	// ===========================================================
 
-			if (returnVal == JFileChooser.APPROVE_OPTION)
-			{
-				File file = fc.getSelectedFile();
-				try
-				{
-					panel.setTree(TreeReader.readTreeFromFile(file));
-				}
-				catch (IOException e)
-				{
-					e.printStackTrace();
-				}
-			}
-		}
+	// ===========================================================
+	// Methods
+	// ===========================================================
 
-	};
-
-	private static final ActionListener mCloseActionListener = new ActionListener()
-	{
-
-		@Override
-		public void actionPerformed(ActionEvent arg0)
-		{
-			// Probably not the best way to close the program //
-			System.exit(0);
-
-		}
-
-	};
-
-	static Node<String> generateRandomTree()
-	{
-		Node<String> root = new Node<String>("root");
-		root.setRoot(true);
-		for (int i = 1; i < 10; i++)
-		{
-			int len = (int) (Math.random() * 10 + 1);
-			int skip = (int) (Math.random() * 3 + 1);
-			Node<String> parent = new Node<String>("Layer 1: " + i);
-			for (int j = 1; j < len; j += skip)
-			{
-				Node<String> child = new Node<String>("Layer 2: " + j);
-				parent.getChildren().add(child);
-				child.setParent(parent);
-
-				boolean makeChildren = (int) (Math.random() * 10) % 2 == 1;
-				if (makeChildren)
-				{
-					int plen = (int) (Math.random() * 10 + 1);
-					int pskip = (int) (Math.random() * 3 + 1);
-					for (int k = 0; k < plen; k += pskip)
-					{
-						Node<String> grandChild = new Node<String>("Layer 3: " + k);
-						child.getChildren().add(grandChild);
-						grandChild.setParent(child);
-					}
-				}
-			}
-			root.getChildren().add(parent);
-			parent.setParent(root);
-		}
-
-		return root;
-	}
+	// ===========================================================
+	// Inner and Anonymous Classes
+	// ===========================================================
 
 }
