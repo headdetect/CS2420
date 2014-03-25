@@ -167,6 +167,8 @@ public class TreeVisualizerPanel extends JPanel implements MouseMotionListener, 
 	@Override
 	public void paint(Graphics g)
 	{
+		
+		
 		Graphics2D g2d = (Graphics2D) g;
 
 		// Turn on anti aliasing so we can get some smoothness up in here //
@@ -180,6 +182,8 @@ public class TreeVisualizerPanel extends JPanel implements MouseMotionListener, 
 
 		g2d.setColor(Color.WHITE);
 		g2d.fillRect(upperLeftX, upperLeftY, visibleWidth, visibleHeight);
+		
+		if(mTree == null) return;
 
 		g2d.setFont(mFont);
 
