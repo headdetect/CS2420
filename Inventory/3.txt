@@ -1,0 +1,19 @@
+FoodItem - UPC Code: 0166406046  Shelf life: 1  Name: classico tomato and basil pasta sauce
+FoodItem - UPC Code: 0472427346  Shelf life: 1  Name: lucky mini chocolate donuts
+FoodItem - UPC Code: 0440955557  Shelf life: 2  Name: spartan crunchy peanut butter
+Warehouse - Lakewood
+Warehouse - Warren
+Warehouse - Midland
+Start date: 3/3/14
+Receive: 0472427346 4 Lakewood
+Receive: 0440955557 3 Warren
+Next day:
+Receive: 0472427346 3 Midland
+Request: 0166406046 4 Lakewood
+Request: 0472427346 10 Warren
+Next day:
+Receive: 0440955557 4 Midland
+Request: 0440955557 6 Warren
+Receive: 0440955557 3 Midland
+Receive: 0440955557 3 Lakewood
+End
