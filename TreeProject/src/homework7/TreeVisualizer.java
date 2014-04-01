@@ -22,8 +22,7 @@ import javax.swing.JScrollPane;
 /**
  * The Class TreeVisualizer.
  */
-public class TreeVisualizer
-{
+public class TreeVisualizer {
 
 	// ===========================================================
 	// Constants
@@ -44,35 +43,29 @@ public class TreeVisualizer
 	static JScrollPane pane;
 
 	/** The File Open Action Listener. */
-	private static final ActionListener mFileOpenActionListener = new ActionListener()
-	{
+	private static final ActionListener mFileOpenActionListener = new ActionListener() {
 
 		@Override
-		public void actionPerformed(ActionEvent arg0)
-		{
+		public void actionPerformed(ActionEvent arg0) {
 			final JFileChooser fc = new JFileChooser();
 			int returnVal = fc.showOpenDialog(panel);
 
-			if (returnVal == JFileChooser.APPROVE_OPTION)
-			{
+			if (returnVal == JFileChooser.APPROVE_OPTION) {
 				File file = fc.getSelectedFile();
-				try
-				{
+				try {
 					Node<String> nodes = TreeReader.readTreeFromFile(file);
-					if (nodes == null)
-					{
-						JOptionPane.showMessageDialog(panel, "Is not a valid tree file");
+					if (nodes == null) {
+						JOptionPane.showMessageDialog(panel,
+								"Is not a valid tree file");
 						return;
 					}
 					panel.setTree(nodes);
-				}
-				catch (IOException e)
-				{
-					JOptionPane.showMessageDialog(panel, "File could not be opened");
-				}
-				catch (Exception e)
-				{
-					JOptionPane.showMessageDialog(panel, "Is not a valid tree file");
+				} catch (IOException e) {
+					JOptionPane.showMessageDialog(panel,
+							"File could not be opened");
+				} catch (Exception e) {
+					JOptionPane.showMessageDialog(panel,
+							"Is not a valid tree file");
 				}
 			}
 		}
@@ -80,12 +73,10 @@ public class TreeVisualizer
 	};
 
 	/** The Close Action Listener. */
-	private static final ActionListener mCloseActionListener = new ActionListener()
-	{
+	private static final ActionListener mCloseActionListener = new ActionListener() {
 
 		@Override
-		public void actionPerformed(ActionEvent arg0)
-		{
+		public void actionPerformed(ActionEvent arg0) {
 			// Probably not the best way to close the program //
 			System.exit(0);
 
@@ -94,12 +85,10 @@ public class TreeVisualizer
 	};
 
 	/** The Reset View Action Listener. */
-	private static final ActionListener mResetViewActionListener = new ActionListener()
-	{
+	private static final ActionListener mResetViewActionListener = new ActionListener() {
 
 		@Override
-		public void actionPerformed(ActionEvent e)
-		{
+		public void actionPerformed(ActionEvent e) {
 			if (panel != null)
 				panel.resetLayout();
 
@@ -118,8 +107,7 @@ public class TreeVisualizer
 	 * @throws IOException
 	 *             Signals that an I/O exception has occurred.
 	 */
-	public static void main(String[] args) throws IOException
-	{
+	public static void main(String[] args) throws IOException {
 		menuBar = new JMenuBar();
 		fileItem = new JMenu("File");
 		loadMenu = new JMenuItem("Load Tree");
@@ -145,6 +133,43 @@ public class TreeVisualizer
 		frame.setJMenuBar(menuBar);
 
 		Node<String> nodes = TreeReader.readTreeFromFile("test.tree");
+
+		panel = new TreeVisualizerPanel(nodes);
+
+		pane = new JScrollPane(panel);
+		panel.setEnclosingPane(pane);
+
+		pane.setPreferredSize(new Dimension(500, 500));
+		frame.add(pane, BorderLayout.CENTER);
+
+		frame.pack();
+		frame.setVisible(true);
+	}
+
+	public static void load(Node<String> nodes) {
+		menuBar = new JMenuBar();
+		fileItem = new JMenu("File");
+		loadMenu = new JMenuItem("Load Tree");
+		loadMenu.addActionListener(mFileOpenActionListener);
+		closeMenu = new JMenuItem("Close");
+		closeMenu.addActionListener(mCloseActionListener);
+
+		viewItem = new JMenu("View");
+		resetViewMenu = new JMenuItem("Reset View");
+		resetViewMenu.addActionListener(mResetViewActionListener);
+
+		fileItem.add(loadMenu);
+		fileItem.add(closeMenu);
+
+		viewItem.add(resetViewMenu);
+
+		menuBar.add(fileItem);
+		menuBar.add(viewItem);
+
+		frame = new JFrame("test.tree");
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.setLayout(new BorderLayout());
+		frame.setJMenuBar(menuBar);
 
 		panel = new TreeVisualizerPanel(nodes);
 
