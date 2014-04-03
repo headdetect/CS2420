@@ -96,27 +96,6 @@ public class SpecialtySet<E extends Comparable<E>>
 		return contains(root, data);
 	}
 
-	private boolean contains(Node root, E data)
-	{
-		if (root == null)
-		{
-			return false;
-		}
-
-		int direction = getDirection(data, root.data);
-		switch (direction)
-		{
-			case CURRENT:
-				return true;
-			case LEFT:
-				return contains(root.left, data);
-			case RIGHT:
-				return contains(root.right, data);
-		}
-
-		return false;
-	}
-
 	/**
 	 * Adds the specified data to the set. (If the data is already in the set, the data is ignored.)
 	 * 
@@ -133,7 +112,7 @@ public class SpecialtySet<E extends Comparable<E>>
 		if (!contains(data))
 		{
 			root = add(root, data);
-			size++;
+
 		}
 
 	}
@@ -153,8 +132,8 @@ public class SpecialtySet<E extends Comparable<E>>
 	{
 		if (!contains(data))
 			return;
-		
-		
+
+		root = remove(root, data);
 
 	}
 
@@ -164,26 +143,75 @@ public class SpecialtySet<E extends Comparable<E>>
 	// -----------------------------------------------------------
 	// -----------------------------------------------------------
 
+	private boolean contains(Node root, E data)
+	{
+		if (root == null || size == 0)
+		{
+			return false;
+		}
+
+		int direction = getDirection(data, root.data);
+		switch (direction)
+		{
+			case CURRENT:
+				return true;
+			case LEFT:
+				return contains(root.left, data);
+			case RIGHT:
+				return contains(root.right, data);
+		}
+
+		return false;
+	}
+
 	private Node add(Node parent, E data)
 	{
 		if (parent == null)
 		{
-			Node node = new Node(data);
-			// node.parent = current;
-			return node;
+			size++;
+			parent = new Node(data);
 		}
-
-		int direction = getDirection(data, parent.data);
-		switch (direction)
+		else
 		{
-			case CURRENT:
-				return parent;
-			case LEFT:
+			int direction = getDirection(data, parent.data);
+			if (direction == LEFT)
 				parent.left = add(parent.left, data);
-			case RIGHT:
+			else
 				parent.right = add(parent.right, data);
-		}
 
+		}
+		return parent;
+	}
+
+	private Node remove(Node parent, E data)
+	{
+		int direction = getDirection(parent.data, data);
+		if (direction == CURRENT)
+		{
+			Node left = parent.left;
+			Node right = parent.right;
+			if(left == null && right == null)
+				return null;
+			else if(left == null)
+				return right;
+			else if(right == null) 
+				return left;
+			else {
+				Node newRoot = right;
+				Node temp = right;
+				while(temp.left != null)
+					temp = temp.left;
+				temp.left = left;
+				return newRoot;
+				
+			}
+		}
+		else if (direction == RIGHT)
+			parent.left = remove(parent.left, data);
+		else
+			parent.right = remove(parent.right, data);
+		
+		
 		return parent;
 	}
 
@@ -202,11 +230,6 @@ public class SpecialtySet<E extends Comparable<E>>
 	public homework7.Data.Node<E> convertNodeTypes()
 	{
 		return root.asOtherNode(null);
-	}
-
-	public void printTree()
-	{
-		new BTreePrinter().printNode(root);
 	}
 
 	// ===========================================================
@@ -265,107 +288,6 @@ public class SpecialtySet<E extends Comparable<E>>
 
 			return node;
 		}
-	}
-
-	class BTreePrinter
-	{
-
-		public void printNode(Node root)
-		{
-			int maxLevel = maxLevel(root);
-
-			printNodeInternal(Collections.singletonList(root), 1, maxLevel);
-		}
-
-		private void printNodeInternal(List<Node> nodes, int level, int maxLevel)
-		{
-			if (nodes.isEmpty() || isAllElementsNull(nodes))
-				return;
-
-			int floor = maxLevel - level;
-			int endgeLines = (int) Math.pow(2, (Math.max(floor - 1, 0)));
-			int firstSpaces = (int) Math.pow(2, (floor)) - 1;
-			int betweenSpaces = (int) Math.pow(2, (floor + 1)) - 1;
-
-			printWhitespaces(firstSpaces);
-
-			List<Node> newNodes = new ArrayList<Node>();
-			for (Node node : nodes)
-			{
-				if (node != null)
-				{
-					System.out.print(node.data);
-					newNodes.add(node.left);
-					newNodes.add(node.right);
-				}
-				else
-				{
-					newNodes.add(null);
-					newNodes.add(null);
-					System.out.print(" ");
-				}
-
-				printWhitespaces(betweenSpaces);
-			}
-			System.out.println("");
-
-			for (int i = 1; i <= endgeLines; i++)
-			{
-				for (int j = 0; j < nodes.size(); j++)
-				{
-					printWhitespaces(firstSpaces - i);
-					if (nodes.get(j) == null)
-					{
-						printWhitespaces(endgeLines + endgeLines + i + 1);
-						continue;
-					}
-
-					if (nodes.get(j).left != null)
-						System.out.print("/");
-					else
-						printWhitespaces(1);
-
-					printWhitespaces(i + i - 1);
-
-					if (nodes.get(j).right != null)
-						System.out.print("\\");
-					else
-						printWhitespaces(1);
-
-					printWhitespaces(endgeLines + endgeLines - i);
-				}
-
-				System.out.println("");
-			}
-
-			printNodeInternal(newNodes, level + 1, maxLevel);
-		}
-
-		private void printWhitespaces(int count)
-		{
-			for (int i = 0; i < count; i++)
-				System.out.print(" ");
-		}
-
-		private int maxLevel(Node node)
-		{
-			if (node == null)
-				return 0;
-
-			return Math.max(maxLevel(node.left), maxLevel(node.right)) + 1;
-		}
-
-		private boolean isAllElementsNull(List list)
-		{
-			for (Object object : list)
-			{
-				if (object != null)
-					return false;
-			}
-
-			return true;
-		}
-
 	}
 
 }

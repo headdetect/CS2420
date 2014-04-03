@@ -1,8 +1,5 @@
 package homework08.impl;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 import java.util.Random;
 
 import homework08.SpecialtySet;
@@ -14,10 +11,17 @@ public class TreeConverter
 	{
 		SpecialtySet<String> set = new SpecialtySet<String>();
 	    Random random = new Random();
-	    for(int i = 0; i < 5; i++)
+	    int[] data = new int[] {1, 5, 4, 9, 3, 2, 11, 49};
+	    for(int d : data)
+	    	set.add(d + "");
+	    for(int i = 1; i < 10; i++)
 	    {
-	        set.add(random.nextInt(100) + "");
+	    	int val = random.nextInt(i);
+	        set.remove(val + "");
+	        System.out.println("Removing: " + val);
 	    }
-	    set.printTree();
+		TreeVisualizer.load(set.convertNodeTypes());
 	}
+	
+
 }

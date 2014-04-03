@@ -45,8 +45,8 @@ public class SpecialtySetTest
     @Test
     public void test01 ()
     {
-        //SpecialtySet<Double> s = new SpecialtySet<Double>();
-        //assertEquals("An newly constructed set should have a 0 size: ", 0, s.size());
+        SpecialtySet<Double> s = new SpecialtySet<Double>();
+        assertEquals("An newly constructed set should have a 0 size: ", 0, s.size());
     }
 
     /**
