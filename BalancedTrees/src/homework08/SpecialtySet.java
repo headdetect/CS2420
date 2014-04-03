@@ -133,6 +133,7 @@ public class SpecialtySet<E extends Comparable<E>>
 		if (!contains(data))
 			return;
 
+		size--;
 		root = remove(root, data);
 
 	}
@@ -203,7 +204,6 @@ public class SpecialtySet<E extends Comparable<E>>
 					temp = temp.left;
 				temp.left = left;
 				return newRoot;
-				
 			}
 		}
 		else if (direction == RIGHT)
