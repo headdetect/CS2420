@@ -1,5 +1,9 @@
 package homework7.Data;
 
+import homework7.Drawables.DrawableNode;
+
+import java.awt.FontMetrics;
+import java.awt.Graphics;
 import java.util.ArrayList;
 
 /**
@@ -56,6 +60,19 @@ public class Node<T>
 	 * 
 	 * @param value
 	 *            the value
+	 */
+	public Node(Node<T> parent, T value)
+	{
+		this.setParent(parent);
+		this.setValue(value);
+		this.setChildren(new ArrayList<Node<T>>());
+	}
+
+	/**
+	 * Instantiates a new node.
+	 * 
+	 * @param value
+	 *            the value
 	 * @param children
 	 *            the children
 	 */
@@ -77,6 +94,7 @@ public class Node<T>
 	 */
 	public Node(Node<T> parent, T value, ArrayList<Node<T>> children)
 	{
+		this.setParent(parent);
 		this.setValue(value);
 		this.setChildren(children);
 	}
@@ -84,7 +102,7 @@ public class Node<T>
 	// ===========================================================
 	// Getter & Setter
 	// ===========================================================
-	
+
 	/**
 	 * Gets the children.
 	 * 
@@ -179,6 +197,10 @@ public class Node<T>
 		return calculateHeight(this);
 	}
 
+	public int getPixelWidth()
+	{
+		return calcWidth(this);
+	}
 
 	// ===========================================================
 	// Methods for/from SuperClass/Interfaces
@@ -187,10 +209,10 @@ public class Node<T>
 	// ===========================================================
 	// Methods
 	// ===========================================================
-	
 
 	/**
 	 * Calculate height starting from the selected node.
+	 * 
 	 * @param node
 	 *            the node
 	 * @return the int
@@ -212,6 +234,17 @@ public class Node<T>
 			}
 			return 1 + biggest;
 		}
+	}
+
+	private int calcWidth(Node<T> node)
+	{
+		int sum = 0;
+		for (int i = 0; i < node.getChildren().size(); i++)
+		{
+			int calculatedWidth = calcWidth(node.getChildren().get(i));
+			sum += calculatedWidth;
+		}
+		return 80 + sum;
 	}
 
 	/**
@@ -253,12 +286,9 @@ public class Node<T>
 
 		return root;
 	}
-	
+
 	// ===========================================================
 	// Inner and Anonymous Classes
 	// ===========================================================
-
-	
-	
 
 }

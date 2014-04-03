@@ -1,6 +1,8 @@
 package homework08;
 
-
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * Objects of this class represent a set of sortable values. The set has the following performace characteristics:
@@ -22,13 +24,27 @@ package homework08;
  */
 public class SpecialtySet<E extends Comparable<E>>
 {
+
+	// ===========================================================
+	// Constants
+	// ===========================================================
+
+	private static final int LEFT = -1;
+	private static final int CURRENT = 0;
+	private static final int RIGHT = 1;
+
+	// ===========================================================
+	// Fields
+	// ===========================================================
+
 	// Instance variables. Students are allowed
 	// only these, do not add or change instance variables.
-
 	private Node root;
 	private int size;
 
-	// Instance methods below.
+	// ===========================================================
+	// Constructors
+	// ===========================================================
 
 	/**
 	 * Constructs an empty set.
@@ -36,6 +52,10 @@ public class SpecialtySet<E extends Comparable<E>>
 	public SpecialtySet()
 	{
 	}
+
+	// ===========================================================
+	// Getter & Setter
+	// ===========================================================
 
 	/**
 	 * Returns the number of elements in this SpecialtySet.
@@ -50,24 +70,51 @@ public class SpecialtySet<E extends Comparable<E>>
 		return size;
 	}
 
+	// ===========================================================
+	// Methods for/from SuperClass/Interfaces
+	// ===========================================================
+
+	// ===========================================================
+	// Methods
+	// ===========================================================
+
+	// -----------------------------------------------------------
+	// -----------------------------------------------------------
+	// Public Operations
+	// -----------------------------------------------------------
+	// -----------------------------------------------------------
 
 	/**
 	 * Returns 'true' if the specified data is in the set, false otherwise.
 	 * 
 	 * @param data
 	 *            A data value to search for
-	 * @return true iff the data is in the set
-	 */
-	/* Implementation note:  The postconditions for the
-	 * 'locatePosition' function are also guaranteed for
-	 * this function.
+	 * @return true if the data is in the set
 	 */
 	public boolean contains(E data)
 	{
-		if (size == 0)
-			return false;
+		return contains(root, data);
+	}
 
-		return true;
+	private boolean contains(Node root, E data)
+	{
+		if (root == null)
+		{
+			return false;
+		}
+
+		int direction = getDirection(data, root.data);
+		switch (direction)
+		{
+			case CURRENT:
+				return true;
+			case LEFT:
+				return contains(root.left, data);
+			case RIGHT:
+				return contains(root.right, data);
+		}
+
+		return false;
 	}
 
 	/**
@@ -85,11 +132,11 @@ public class SpecialtySet<E extends Comparable<E>>
 	{
 		if (!contains(data))
 		{
-			
+			root = add(root, data);
 			size++;
 		}
+
 	}
-	
 
 	/**
 	 * Guarantees that the specified data is not in the set. (The data is removed if needed.)
@@ -106,12 +153,65 @@ public class SpecialtySet<E extends Comparable<E>>
 	{
 		if (!contains(data))
 			return;
+		
+		
 
 	}
-	
-	
 
-	// An example of an inner class (a class within another object).
+	// -----------------------------------------------------------
+	// -----------------------------------------------------------
+	// Private Drivers
+	// -----------------------------------------------------------
+	// -----------------------------------------------------------
+
+	private Node add(Node parent, E data)
+	{
+		if (parent == null)
+		{
+			Node node = new Node(data);
+			// node.parent = current;
+			return node;
+		}
+
+		int direction = getDirection(data, parent.data);
+		switch (direction)
+		{
+			case CURRENT:
+				return parent;
+			case LEFT:
+				parent.left = add(parent.left, data);
+			case RIGHT:
+				parent.right = add(parent.right, data);
+		}
+
+		return parent;
+	}
+
+	// -----------------------------------------------------------
+	// -----------------------------------------------------------
+	// Abstract Operations
+	// -----------------------------------------------------------
+	// -----------------------------------------------------------
+
+	private int getDirection(E toCheck, E data)
+	{
+		return (int) Math.signum(toCheck.compareTo(data));
+	}
+
+	// TODO: Remove for submition //
+	public homework7.Data.Node<E> convertNodeTypes()
+	{
+		return root.asOtherNode(null);
+	}
+
+	public void printTree()
+	{
+		new BTreePrinter().printNode(root);
+	}
+
+	// ===========================================================
+	// Inner and Anonymous Classes
+	// ===========================================================
 
 	/**
 	 * A private helper class for the SpecialtySet class. Node objects are used to construct linked lists in a SpecialtySet.
@@ -121,13 +221,13 @@ public class SpecialtySet<E extends Comparable<E>>
 	 * @author Peter Jensen
 	 * @version 2/22/2014
 	 */
-	private class Node
+	class Node
 	{
-		private E data; 			// The data element - cannot be changed after it is assigned
-		private Node left, right; 	// Initialized to null when this object is created
-		private Node parent; 		// Parent - initialized to null
-		private int height; 		// Height of this subtree - initialized to 0
-		
+		private E data; // The data element - cannot be changed after it is assigned
+		private Node left, right; // Initialized to null when this object is created
+		private Node parent; // Parent - initialized to null
+		private int height; // Height of this subtree - initialized to 0
+
 		/**
 		 * Builds this node to contain the specified data. By default, this node does not point to any other nodes (next is null), although it is expected that 'next' may change.
 		 * 
@@ -146,6 +246,126 @@ public class SpecialtySet<E extends Comparable<E>>
 		{
 			return data.toString();
 		}
+
+		public homework7.Data.Node<E> asOtherNode(homework7.Data.Node<E> parent)
+		{
+			ArrayList<homework7.Data.Node<E>> children = new ArrayList<homework7.Data.Node<E>>(2);
+			homework7.Data.Node<E> node = new homework7.Data.Node<E>(data);
+
+			if (left != null)
+				children.add(left.asOtherNode(node));
+
+			if (right != null)
+				children.add(right.asOtherNode(node));
+
+			if (parent != null)
+				node.setParent(parent);
+
+			node.setChildren(children);
+
+			return node;
+		}
+	}
+
+	class BTreePrinter
+	{
+
+		public void printNode(Node root)
+		{
+			int maxLevel = maxLevel(root);
+
+			printNodeInternal(Collections.singletonList(root), 1, maxLevel);
+		}
+
+		private void printNodeInternal(List<Node> nodes, int level, int maxLevel)
+		{
+			if (nodes.isEmpty() || isAllElementsNull(nodes))
+				return;
+
+			int floor = maxLevel - level;
+			int endgeLines = (int) Math.pow(2, (Math.max(floor - 1, 0)));
+			int firstSpaces = (int) Math.pow(2, (floor)) - 1;
+			int betweenSpaces = (int) Math.pow(2, (floor + 1)) - 1;
+
+			printWhitespaces(firstSpaces);
+
+			List<Node> newNodes = new ArrayList<Node>();
+			for (Node node : nodes)
+			{
+				if (node != null)
+				{
+					System.out.print(node.data);
+					newNodes.add(node.left);
+					newNodes.add(node.right);
+				}
+				else
+				{
+					newNodes.add(null);
+					newNodes.add(null);
+					System.out.print(" ");
+				}
+
+				printWhitespaces(betweenSpaces);
+			}
+			System.out.println("");
+
+			for (int i = 1; i <= endgeLines; i++)
+			{
+				for (int j = 0; j < nodes.size(); j++)
+				{
+					printWhitespaces(firstSpaces - i);
+					if (nodes.get(j) == null)
+					{
+						printWhitespaces(endgeLines + endgeLines + i + 1);
+						continue;
+					}
+
+					if (nodes.get(j).left != null)
+						System.out.print("/");
+					else
+						printWhitespaces(1);
+
+					printWhitespaces(i + i - 1);
+
+					if (nodes.get(j).right != null)
+						System.out.print("\\");
+					else
+						printWhitespaces(1);
+
+					printWhitespaces(endgeLines + endgeLines - i);
+				}
+
+				System.out.println("");
+			}
+
+			printNodeInternal(newNodes, level + 1, maxLevel);
+		}
+
+		private void printWhitespaces(int count)
+		{
+			for (int i = 0; i < count; i++)
+				System.out.print(" ");
+		}
+
+		private int maxLevel(Node node)
+		{
+			if (node == null)
+				return 0;
+
+			return Math.max(maxLevel(node.left), maxLevel(node.right)) + 1;
+		}
+
+		private boolean isAllElementsNull(List list)
+		{
+			for (Object object : list)
+			{
+				if (object != null)
+					return false;
+			}
+
+			return true;
+		}
+
 	}
 
 }

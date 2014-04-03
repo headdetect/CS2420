@@ -21,7 +21,7 @@ public class DrawableNode implements Drawable
 	// ===========================================================
 	// Fields
 	// ===========================================================
-	
+
 	private int x, y;
 
 	private String text;
@@ -31,7 +31,7 @@ public class DrawableNode implements Drawable
 	// ===========================================================
 	// Constructors
 	// ===========================================================
-	
+
 	/**
 	 * Instantiates a new drawable node type.
 	 * 
@@ -66,11 +66,10 @@ public class DrawableNode implements Drawable
 		this.text = text;
 	}
 
-
 	// ===========================================================
 	// Getter & Setter
 	// ===========================================================
-	
+
 	/**
 	 * Gets the x position.
 	 * 
@@ -158,7 +157,7 @@ public class DrawableNode implements Drawable
 	// ===========================================================
 	// Methods for/from SuperClass/Interfaces
 	// ===========================================================
-	
+
 	@Override
 	public void draw(Graphics2D g)
 	{
@@ -185,15 +184,10 @@ public class DrawableNode implements Drawable
 	// Methods
 	// ===========================================================
 
+	
+
 	// ===========================================================
 	// Inner and Anonymous Classes
 	// ===========================================================
-
-	
-
-	
-	
-
-	
 
 }
