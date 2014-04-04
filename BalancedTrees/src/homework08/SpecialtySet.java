@@ -1,24 +1,27 @@
 package homework08;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Random;
 
 /**
- * Objects of this class represent a set of sortable values. The set has the following performace characteristics:
+ * Objects of this class represent a set of sortable values. The set has the following performance characteristics:
  * 
  * - the set is kept in a sorted linked list
  * 
- * - getting the size of the set - theta(1)
+ * - getting the size of the set - O(1)
  * 
- * - adding, removing, or searching for a random element - theta(n)
+ * - adding, removing, or searching for a random element - O(log n)
  * 
- * - adding, removing, or searching for an element that immediately follows the previously accessed element - theta(1)
  * 
- * In other words, this set performs very well if additions or removals occur with long sequential runs of ordered data values.
- * 
- * Note: This data structure is not threadsafe because instance variables are used to keep track of visit state. An iterator would be a much better idea!
- * 
- * @author your_name_here
- * @version current_date_here
+ * @author Brayden.Lopez
+ * @version 4/4/14
+ * @param <E>
+ *            the element type
  */
 public class SpecialtySet<E extends Comparable<E>>
 {
@@ -28,7 +31,7 @@ public class SpecialtySet<E extends Comparable<E>>
 	// ===========================================================
 
 	private static final int LEFT = -1;
-	private static final int CURRENT = 0;
+
 	private static final int RIGHT = 1;
 
 	// ===========================================================
@@ -38,7 +41,10 @@ public class SpecialtySet<E extends Comparable<E>>
 	// Instance variables. Students are allowed
 	// only these, do not add or change instance variables.
 	private Node root;
+
 	private int size;
+
+	// public int balanceLoad = 2;
 
 	// ===========================================================
 	// Constructors
@@ -76,11 +82,14 @@ public class SpecialtySet<E extends Comparable<E>>
 	// Methods
 	// ===========================================================
 
-	// -----------------------------------------------------------
-	// -----------------------------------------------------------
-	// Public Operations
-	// -----------------------------------------------------------
-	// -----------------------------------------------------------
+	/*
+	 * Public Operations
+	 * -----------------------------------------------------------
+	 * - contains(E)
+	 * - add(E)
+	 * - remove(E)
+	 * -----------------------------------------------------------
+	*/
 
 	/**
 	 * Returns 'true' if the specified data is in the set, false otherwise.
@@ -104,7 +113,6 @@ public class SpecialtySet<E extends Comparable<E>>
 	{
 		// We don't need a contains because it just ignores if it already exists //
 		Node node = new Node(data);
-		size++;
 		add(root, node);
 
 	}
@@ -122,15 +130,26 @@ public class SpecialtySet<E extends Comparable<E>>
 			return;
 
 		remove(node);
-		size--;
 	}
 
-	// -----------------------------------------------------------
-	// -----------------------------------------------------------
-	// Private Drivers
-	// -----------------------------------------------------------
-	// -----------------------------------------------------------
+	/*
+	 * Private Drivers
+	 * -----------------------------------------------------------
+	 * - contains(Node, E)
+	 * - add(Node, Node)
+	 * - remove(Node)
+	 * -----------------------------------------------------------
+	*/
 
+	/**
+	 * Checks to see if specified data exists in the set.
+	 * 
+	 * @param node
+	 *            the node
+	 * @param data
+	 *            the data
+	 * @return true, if successful
+	 */
 	private boolean contains(Node node, E data)
 	{
 		if (root == null || size == 0 || node == null)
@@ -141,11 +160,20 @@ public class SpecialtySet<E extends Comparable<E>>
 		return find(node, data) != null;
 	}
 
+	/**
+	 * Adds the <i>toInsert</i> node to the <i>node</i> node.
+	 * 
+	 * @param node
+	 *            the node
+	 * @param toInsert
+	 *            the to insert
+	 */
 	private void add(Node node, Node toInsert)
 	{
 		if (node == null)
 		{
 			root = toInsert;
+			size++;
 		}
 		else
 		{
@@ -158,6 +186,7 @@ public class SpecialtySet<E extends Comparable<E>>
 					node.left = toInsert;
 					toInsert.parent = node;
 					balance(node);
+					size++;
 				}
 				else
 				{
@@ -172,6 +201,7 @@ public class SpecialtySet<E extends Comparable<E>>
 					node.right = toInsert;
 					toInsert.parent = node;
 					balance(node);
+					size++;
 				}
 				else
 				{
@@ -182,36 +212,27 @@ public class SpecialtySet<E extends Comparable<E>>
 			{
 				// Already exists. Ignore //
 			}
-			
+
 		}
 	}
 
-	private Node find(Node start, E data)
-	{
-		while( start != null ) {
-			if( data == start.data ) return start; 
-			int direction = getDirection(data, start.data);
-			
-			if(direction == LEFT) {
-				start = start.left;
-			} else if (direction == RIGHT) {
-				start = start.right;
-			} else {
-				return start;
-			}
-		}
-		return null;
-	}
-
+	/**
+	 * Removes the specified node from the set.
+	 * 
+	 * @param node
+	 *            the node
+	 */
 	private void remove(Node node)
 	{
 		Node replace;
 		if (node.left == null || node.right == null)
 		{
+			// If is root //
 			if (node.parent == null)
 			{
 				this.root = null;
 				node = null;
+				size = 0;
 				return;
 			}
 			replace = node;
@@ -222,32 +243,45 @@ public class SpecialtySet<E extends Comparable<E>>
 			node.data = replace.data;
 		}
 
-		Node parent;
-		if (replace.left != null)
-			parent = replace.left;
-		else
-			parent = replace.right;
+		Node parent = replace.left != null ? replace.left : replace.right;
 
 		if (parent != null)
 			parent.parent = replace.parent;
 
 		if (replace.parent == null)
-			this.root = parent;
+			root = parent;
 		else
 		{
 			if (replace == replace.parent.left)
 				replace.parent.left = parent;
 			else
 				replace.parent.right = parent;
-			balance(replace.parent);
-		}
-		replace = null;
 
+			balance(replace.parent);
+			size--;
+		}
 	}
 
+	/*
+	 * Balancing Operations
+	 * -----------------------------------------------------------
+	 * - balance(Node)
+	 * - rotateRight(Node)
+	 * - rotateLeft(Node)
+	 * -----------------------------------------------------------
+	 */
+
+	/**
+	 * Balance the tree. Meets AVL standard.
+	 * 
+	 * @param node
+	 *            the node
+	 */
 	private void balance(Node node)
 	{
 		int difference = getNodeHeight(node.right) - getNodeHeight(node.left);
+
+		// if (difference <= -balanceLoad)
 		if (difference <= -2)
 		{
 
@@ -261,6 +295,7 @@ public class SpecialtySet<E extends Comparable<E>>
 				node = rotateRight(node);
 			}
 		}
+		// else if (difference >= balanceLoad)
 		else if (difference >= 2)
 		{
 			if (getNodeHeight(node.right.right) >= getNodeHeight(node.right.left))
@@ -276,33 +311,17 @@ public class SpecialtySet<E extends Comparable<E>>
 
 		if (node.parent != null)
 			balance(node.parent);
-		else {
-			root = node;
-			System.out.println("------------ Balancing finished ----------------");
-		}
-	}
-
-	private Node getSuccessor(Node node)
-	{
-		if (node.right != null)
-		{
-			Node right = node.right;
-			while (right.left != null)
-				right = right.left;
-			return right;
-		}
 		else
-		{
-			Node parent = node.parent;
-			while (parent != null && node == parent.right)
-			{
-				node = parent;
-				parent = node.parent;
-			}
-			return parent;
-		}
+			root = node;
 	}
 
+	/**
+	 * Rotates the sub-tree one to the right.
+	 * 
+	 * @param node
+	 *            the node
+	 * @return the node
+	 */
 	private Node rotateRight(Node node)
 	{
 		Node left = node.left;
@@ -325,6 +344,13 @@ public class SpecialtySet<E extends Comparable<E>>
 		return left;
 	}
 
+	/**
+	 * Rotates the sub-tree one to the left.
+	 * 
+	 * @param node
+	 *            the node
+	 * @return the node
+	 */
 	private Node rotateLeft(Node node)
 	{
 		Node right = node.right;
@@ -347,77 +373,214 @@ public class SpecialtySet<E extends Comparable<E>>
 		return right;
 	}
 
+	/*
+	 * Abstract Functions
+	 * -----------------------------------------------------------
+	 * - find(Node, E)
+	 * - getNodeHeight(Node)
+	 * - getDirection(E, E)
+	 * - getSuccessor(Node)
+	 * -----------------------------------------------------------
+	 */
+
+	/**
+	 * Finds the node that contains the data.
+	 * 
+	 * @param start
+	 *            the start
+	 * @param data
+	 *            the data
+	 * @return the node
+	 */
+	private Node find(Node start, E data)
+	{
+		while (start != null)
+		{
+			if (data == start.data)
+				return start;
+			int direction = getDirection(data, start.data);
+
+			if (direction == LEFT)
+			{
+				start = start.left;
+			}
+			else if (direction == RIGHT)
+			{
+				start = start.right;
+			}
+			else
+			{
+				return start;
+			}
+		}
+		return null;
+	}
+
+	/**
+	 * Gets the successor to the specified node.
+	 * 
+	 * @param node
+	 *            the node
+	 * @return the successor
+	 */
+	private Node getSuccessor(Node node)
+	{
+		if (node.right != null)
+		{
+			Node right = node.right;
+			while (right.left != null)
+				right = right.left;
+			return right;
+		}
+		else
+		{
+			Node parent = node.parent;
+			while (parent != null && node == parent.right)
+			{
+				node = parent;
+				parent = node.parent;
+			}
+			return parent;
+		}
+	}
+
+	/**
+	 * Recursivly gets the node height.
+	 * 
+	 * @param node
+	 *            the node
+	 * @return the node height
+	 */
 	private int getNodeHeight(Node node)
 	{
 		if (node == null)
 			return 0;
 		if (node.left == null && node.right == null)
+		{
+			node.height = 1;
 			return 1;
+		}
 		else if (node.left == null)
-			return 1 + getNodeHeight(node.right);
+		{
+			node.height = getNodeHeight(node.right) + 1;
+			return node.height;
+		}
 		else if (node.right == null)
-			return 1 + getNodeHeight(node.left);
+		{
+			node.height = getNodeHeight(node.left) + 1;
+			return node.height;
+		}
 		else
-			return 1 + Math.max(getNodeHeight(node.left), getNodeHeight(node.right));
+		{
+			node.height = Math.max(getNodeHeight(node.left), getNodeHeight(node.right)) + 1;
+			return node.height;
+		}
+
 	}
 
-	// -----------------------------------------------------------
-	// -----------------------------------------------------------
-	// Abstract Operations
-	// -----------------------------------------------------------
-	// -----------------------------------------------------------
-
+	/**
+	 * Gets the direction that the data should be placed in.
+	 * 
+	 * @param toCheck
+	 *            the to check
+	 * @param data
+	 *            the data
+	 * @return the direction
+	 */
 	private int getDirection(E toCheck, E data)
 	{
 		return (int) Math.signum(toCheck.compareTo(data));
 	}
 
-	// TODO: Remove for submition //
+	/*
+	 * Converts all nodes into a homework07.Node to be used in TreeVisualizationPanel
+	 */
 	public homework7.Data.Node<String> convertNodeTypes()
 	{
 		return root.asOtherNode(null);
 	}
-	
+
 	/**
-	 * Only for debugging purposes. Gives all information about a node.
-	 * 
-	 * @param n
-	 *            The node to write information about.
+	 * Prints the attributes of the nodes. For debugs.
 	 */
-	private void debug(Node n)
+	private void printSet(Node n)
 	{
 		E l = null;
 		E r = null;
 		E p = null;
+
 		if (n.left != null)
-		{
 			l = n.left.data;
-		}
+
 		if (n.right != null)
-		{
 			r = n.right.data;
-		}
+
 		if (n.parent != null)
-		{
 			p = n.parent.data;
-		}
-		
+
 		String left = l == null ? "null" : l.toString();
 
-		System.out.println("Key: " + n + "\t\tLeft: " + l + (left.toString().length() > 1 ? "\t" : "\t\t") + "Right: " + r + "\tParent: " + p);
+		System.out.println("Value: " + n + "\tHeight: " + n.height + "\t\tLeft: " + l + (left.toString().length() > 1 ? "\t" : "\t\t") + "Right: " + r + "\tParent: " + p);
 
 		if (n.left != null)
-		{
-			debug(n.left);
-		}
+			printSet(n.left);
+
 		if (n.right != null)
-		{
-			debug(n.right);
-		}
+			printSet(n.right);
 	}
-	
-	public void debug() {
-		debug(root);
+
+	/**
+	 * Prints the attributes of the nodes. For debugs.
+	 */
+	public void printSet()
+	{
+		printSet(root);
+	}
+
+	public void writeFile(File f) throws IOException
+	{
+		if (!f.exists())
+			f.createNewFile();
+
+		BufferedWriter stream = new BufferedWriter(new FileWriter(f));
+		writeNode(stream, root);
+		stream.flush();
+		stream.close();
+	}
+
+	private int currSpaces;
+	private HashMap<Integer, String> index = new HashMap<Integer, String>();
+
+	private void writeNode(BufferedWriter out, Node node) throws IOException
+	{
+		int key = getRandomKey();
+		index.put(key, node.data.toString());
+
+		out.append(getSpaces() + "<" + key + " " + node.data.toString() + ">\n");
+		currSpaces += 3;
+		if (node.left != null)
+			writeNode(out, node.left);
+		if (node.right != null)
+			writeNode(out, node.right);
+		currSpaces -= 3;
+		out.append(getSpaces() + "</" + key + ">\n");
+	}
+
+	private String getSpaces()
+	{
+		char[] spaces = new char[currSpaces];
+		for (int i = 0; i < currSpaces; i++)
+			spaces[i] = ' ';
+		return new String(spaces);
+	}
+
+	private int getRandomKey()
+	{
+		Random r = new Random();
+		int val = r.nextInt(Math.max(size, 100));
+		while (index.containsKey(val))
+			val = r.nextInt(Math.max(size, 100));
+		return val;
 	}
 
 	// ===========================================================
@@ -434,6 +597,7 @@ public class SpecialtySet<E extends Comparable<E>>
 	 */
 	class Node
 	{
+
 		private E data; // The data element - cannot be changed after it is assigned
 		private Node left; // Initialized to null when this object is created
 		private Node right;
@@ -458,7 +622,10 @@ public class SpecialtySet<E extends Comparable<E>>
 		{
 			return data.toString();
 		}
-		
+
+		/* 
+		 * Converts homework08.Node to a homework07.Node to be used in the TreeVisualizationPanel
+		 */
 		public homework7.Data.Node<String> asOtherNode(homework7.Data.Node<String> parent)
 		{
 			ArrayList<homework7.Data.Node<String>> children = new ArrayList<homework7.Data.Node<String>>(2);

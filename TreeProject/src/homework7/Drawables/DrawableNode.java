@@ -16,7 +16,7 @@ public class DrawableNode implements Drawable
 
 	private static final int NODE_THICKNESS = 4;
 
-	private static final int NODE_SIZE = 50;
+	private static final int NODE_SIZE = 80;
 
 	// ===========================================================
 	// Fields

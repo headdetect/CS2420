@@ -3,8 +3,8 @@ package homework08;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.io.File;
+import java.io.IOException;
 import java.util.Random;
 import java.util.Set;
 import java.util.TreeSet;
@@ -142,6 +142,130 @@ public class SpecialtySetTest
 
 	}
 
+	@Test
+	public void test04()
+	{
+		SpecialtySet<Integer> s = new SpecialtySet<Integer>();
+		Set<Integer> v = new TreeSet<Integer>();
+
+		Random r = new Random();
+
+		// Repeatedly 'visit' sequences of numbers.
+
+		for (int repeat = 0; repeat < 100; repeat++)
+		{
+			// Pick a base, length, step
+
+			int base = r.nextInt(1000);
+			int length = r.nextInt(50) + 50;
+			int step = r.nextInt(3) + 1;
+
+			// Do an action the appropriate number of times.
+
+			for (int i = 0; i < length; i++)
+			{
+				// Make the next integer in the sequence.
+
+				Integer ti = new Integer(base + i * step);
+
+				// Pick an action.
+
+				int action = r.nextInt(2);
+
+				// Do the action.
+
+				if (action == 0)
+				{
+					s.add(ti); // Change our set
+					v.add(ti); // Also change the known good set
+				}
+				else if (action == 1)
+				{
+					s.remove(ti); // Change our set
+					v.remove(ti); // Also change the known good set
+				}
+			}
+		}
+
+		assertTrue(s.size() == v.size());
+
+	}
+
+	@Test
+	public void test05()
+	{
+
+		// Repeatedly 'visit' sequences of numbers.
+
+		TrackedInteger.comparisonCount = 0;
+		for (int samples = 0; samples < 10; samples++)
+		{
+			SpecialtySet<TrackedInteger> s = new SpecialtySet<TrackedInteger>();
+			long start = TrackedInteger.comparisonCount;
+			Random r = new Random();
+
+			for (int repeat = 0; repeat < 10000; repeat++)
+			{
+				// Make the next integer in the sequence.
+
+				TrackedInteger ti = new TrackedInteger((int) Math.round(repeat + r.nextDouble()));
+
+				s.add(ti); // Change our set
+			}
+			System.out.println("Delta: " + (TrackedInteger.comparisonCount - start));
+		}
+
+		System.out.println("Total number of comparisons: " + TrackedInteger.comparisonCount + ", Average number of comparisons: " + (TrackedInteger.comparisonCount / 10));
+	}
+
+	@Test
+	public void test06()
+	{
+//		System.out.println("\nBalance Loads");
+//		System.out.println("n\tbalance = n");
+//
+//		Random r = new Random();
+//
+//		for (int samples = 0; samples <= 10; samples++)
+//		{
+//			SpecialtySet<TrackedInteger> s = new SpecialtySet<TrackedInteger>();
+//			s.balanceLoad = samples + 1;
+//			TrackedInteger.comparisonCount = 0;
+//
+//			for (int repeat = 0; repeat < 10000; repeat++)
+//			{
+//				// Make the next integer in the sequence.
+//
+//				TrackedInteger ti = new TrackedInteger(r.nextInt());
+//
+//				s.add(ti); // Change our set
+//			}
+//
+//			System.out.println(samples + "\t" + TrackedInteger.comparisonCount);
+//		}
+	}
+
+	@Test
+	public void test07()
+	{
+		String[] values = "the quick brown fox jumped over the lazy dog.".split(" ");
+
+		SpecialtySet<String> s = new SpecialtySet<String>();
+		
+		for(String str : values)
+			s.add(str);
+
+		try
+		{
+			s.writeFile(new File("quickfox.tree"));
+		}
+		catch (IOException e)
+		{
+			e.printStackTrace();
+		}
+
+	}
+
 	/**
 	 * A helper class with a static variable for tracking all comparisons made with any of this type of object.
 	 * 
@@ -151,7 +275,6 @@ public class SpecialtySetTest
 	private static class TrackedInteger implements Comparable<TrackedInteger>
 	{
 		static long comparisonCount = 0;
-		static HashMap<String, Integer> stacks = new HashMap<>();
 
 		Integer i;
 
@@ -163,10 +286,6 @@ public class SpecialtySetTest
 		@Override
 		public int compareTo(TrackedInteger o)
 		{
-			String method = new Throwable().getStackTrace()[3].getMethodName();
-			if (!stacks.containsKey(method))
-				stacks.put(method, 0);
-			stacks.put(method, stacks.get(method) + 1);
 			comparisonCount++;
 			return i.compareTo(o.i);
 		}

@@ -38,7 +38,7 @@ public class TreeVisualizerPanel extends JPanel implements MouseMotionListener, 
 	 */
 	private static final long serialVersionUID = 4536105668603835030L;
 
-	private static int NODE_SIZE = 80;
+	private static int NODE_SIZE = 100;
 	private static int STARTING_POS = 100;
 
 	// ===========================================================
@@ -153,15 +153,23 @@ public class TreeVisualizerPanel extends JPanel implements MouseMotionListener, 
 		this.mTree = mTree;
 		mNodes.clear();
 		mEdges.clear();
+		mRectangles.clear();
+
+		currX = STARTING_POS;
+		currY = STARTING_POS;
+
+		mParentDrawNode = null;
+
+		currentColorIteration = 0;
 
 		recurseLoad(mTree);
 
 		if (mTree != null)
 		{
-			this.setMinimumSize(new Dimension(mTree.getPixelWidth(), mTree.getHeight() * NODE_SIZE));
-			this.setPreferredSize(new Dimension(mTree.getPixelWidth(), mTree.getHeight() * NODE_SIZE));
+			this.setMinimumSize(new Dimension(mTree.getPixelWidth() + 100, mTree.getHeight() * NODE_SIZE));
+			this.setPreferredSize(new Dimension(mTree.getPixelWidth() + 100, mTree.getHeight() * NODE_SIZE));
 		}
-		
+
 		revalidate();
 		repaint();
 
@@ -307,8 +315,6 @@ public class TreeVisualizerPanel extends JPanel implements MouseMotionListener, 
 	// Inner and Anonymous Classes
 	// ===========================================================
 
-	private final int WIDTH = 600;
-
 	/**
 	 * Recurse load.
 	 * 
@@ -324,7 +330,7 @@ public class TreeVisualizerPanel extends JPanel implements MouseMotionListener, 
 		DrawableNode drawNode = new DrawableNode(currX + (nodeWidth / 2), currY, node.getValue(), colors[currentColorIteration % 5]);
 		mNodes.put(node, drawNode);
 
-		//mRectangles.add(new Rectangle(currX + (nodeWidth / 2), currY, node.getPixelWidth(), NODE_SIZE));
+		// mRectangles.add(new Rectangle(currX + (nodeWidth / 2), currY, node.getPixelWidth(), NODE_SIZE));
 
 		DrawableEdge drawEdge = new DrawableEdge(mParentDrawNode, drawNode);
 		mEdges.add(drawEdge);
@@ -338,7 +344,7 @@ public class TreeVisualizerPanel extends JPanel implements MouseMotionListener, 
 			{
 				mParentDrawNode = drawNode;
 				recurseLoad(node.getChildren().get(i));
-				currX += node.getChildren().get(i).getPixelWidth();
+				currX += node.getChildren().get(i).getPixelWidth() + 20;
 			}
 
 			if (mParentDrawNode != null)

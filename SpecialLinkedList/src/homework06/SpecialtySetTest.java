@@ -141,6 +141,35 @@ public class SpecialtySetTest
          //assertEquals(s.validate(), true);
     }
     
+
+	@Test
+	public void test05()
+	{
+
+		// Repeatedly 'visit' sequences of numbers.
+
+		TrackedInteger.comparisonCount = 0;
+		for (int samples = 0; samples < 10; samples++)
+		{
+			SpecialtySet<TrackedInteger> s = new SpecialtySet<TrackedInteger>();
+			long start = TrackedInteger.comparisonCount;
+			double delta = 10000 / (float) 99999;
+			Random r = new Random();
+
+			for (int repeat = 0; repeat < 10000; repeat++)
+			{
+				// Make the next integer in the sequence.
+
+				TrackedInteger ti = new TrackedInteger((int) Math.round(repeat + r.nextDouble()));
+
+				s.add(ti); // Change our set
+			}
+			System.out.println("Delta: " + (TrackedInteger.comparisonCount - start));
+		}
+
+		System.out.println("Total number of comparisons: " + TrackedInteger.comparisonCount + ", Average number of comparisons: " + (TrackedInteger.comparisonCount / 10));
+	}
+    
     /**
      * A helper class with a static variable for tracking all comparisons
      * made with any of this type of object.

@@ -1,10 +1,9 @@
 package homework08.impl;
 
-import java.util.Random;
-
-import homework08.AVLTree;
 import homework08.SpecialtySet;
 import homework7.TreeVisualizer;
+
+import java.util.Random;
 
 public class TreeConverter
 {
@@ -17,14 +16,14 @@ public class TreeConverter
 	    for(int d : data)
 	    	set.add(d);
 	    	//set.insert(d);
-	    for(int i = 1; i <0; i++)
+	    for(int i = 1; i < 0; i++)
 	    {
 	    	int val = random.nextInt(i * 10);
 	        set.add(val);
 	    	//set.insert(val);
 	        System.out.println("Removing: " + val);
 	    }
-	    set.debug();
+	    set.printSet();
 		TreeVisualizer.load(set.convertNodeTypes());
 	}
 	
