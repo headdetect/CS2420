@@ -20,9 +20,6 @@ public class AVLTree
 	 */
 	public void insert(int k)
 	{
-		if (contains(k))
-			return;
-		
 		// create new node
 		// start recursive procedure for inserting the node
 		insertAVL(root,  new AvlNode(k));
@@ -31,51 +28,51 @@ public class AVLTree
 	/**
 	 * Recursive method to insert a node into a tree.
 	 * 
-	 * @param p
+	 * @param node
 	 *            The node currently compared, usually you start with the root.
-	 * @param q
+	 * @param toInsert
 	 *            The node to be inserted.
 	 */
-	public void insertAVL(AvlNode p, AvlNode q)
+	public void insertAVL(AvlNode node, AvlNode toInsert)
 	{
 		// If node to compare is null, the node is inserted. If the root is null, it is the root of the tree.
-		if (p == null)
+		if (node == null)
 		{
-			this.root = q;
+			this.root = toInsert;
 		}
 		else
 		{
 
 			// If compare node is smaller, continue with the left node
-			if (q.key < p.key)
+			if (toInsert.key < node.key)
 			{
-				if (p.left == null)
+				if (node.left == null)
 				{
-					p.left = q;
-					q.parent = p;
+					node.left = toInsert;
+					toInsert.parent = node;
 
 					// Node is inserted now, continue checking the balance
-					recursiveBalance(p);
+					//recursiveBalance(p);
 				}
 				else
 				{
-					insertAVL(p.left, q);
+					insertAVL(node.left, toInsert);
 				}
 
 			}
-			else if (q.key > p.key)
+			else if (toInsert.key > node.key)
 			{
-				if (p.right == null)
+				if (node.right == null)
 				{
-					p.right = q;
-					q.parent = p;
+					node.right = toInsert;
+					toInsert.parent = node;
 
 					// Node is inserted now, continue checking the balance
-					recursiveBalance(p);
+					//recursiveBalance(p);
 				}
 				else
 				{
-					insertAVL(p.right, q);
+					insertAVL(node.right, toInsert);
 				}
 			}
 			else
@@ -236,7 +233,7 @@ public class AVLTree
 				r.parent.right = p;
 			}
 			// balancing must be done until the root is reached.
-			recursiveBalance(r.parent);
+			//recursiveBalance(r.parent);
 		}
 		r = null;
 	}

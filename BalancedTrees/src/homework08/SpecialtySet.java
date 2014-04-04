@@ -1,8 +1,6 @@
 package homework08;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 
 /**
  * Objects of this class represent a set of sortable values. The set has the following performace characteristics:
@@ -39,7 +37,7 @@ public class SpecialtySet<E extends Comparable<E>>
 
 	// Instance variables. Students are allowed
 	// only these, do not add or change instance variables.
-	private Node<E> root;
+	private Node root;
 	private int size;
 
 	// ===========================================================
@@ -105,7 +103,7 @@ public class SpecialtySet<E extends Comparable<E>>
 	public void add(E data)
 	{
 		// We don't need a contains because it just ignores if it already exists //
-		Node<E> node = new Node<E>(data);
+		Node node = new Node(data);
 		size++;
 		add(root, node);
 
@@ -119,7 +117,7 @@ public class SpecialtySet<E extends Comparable<E>>
 	 */
 	public void remove(E data)
 	{
-		Node<E> node = find(root, data);
+		Node node = find(root, data);
 		if (node == null)
 			return;
 
@@ -133,7 +131,7 @@ public class SpecialtySet<E extends Comparable<E>>
 	// -----------------------------------------------------------
 	// -----------------------------------------------------------
 
-	private boolean contains(Node<E> node, E data)
+	private boolean contains(Node node, E data)
 	{
 		if (root == null || size == 0 || node == null)
 		{
@@ -143,7 +141,7 @@ public class SpecialtySet<E extends Comparable<E>>
 		return find(node, data) != null;
 	}
 
-	private void add(Node<E> node, Node<E> toInsert)
+	private void add(Node node, Node toInsert)
 	{
 		if (node == null)
 		{
@@ -151,9 +149,9 @@ public class SpecialtySet<E extends Comparable<E>>
 		}
 		else
 		{
-			int direction = getDirection(toInsert.data, node.data);
+			int direction = toInsert.data.compareTo(node.data);
 
-			if (direction == LEFT)
+			if (direction < 0)
 			{
 				if (node.left == null)
 				{
@@ -167,7 +165,7 @@ public class SpecialtySet<E extends Comparable<E>>
 				}
 
 			}
-			else if (direction == RIGHT)
+			else if (direction > 0)
 			{
 				if (node.right == null)
 				{
@@ -188,7 +186,7 @@ public class SpecialtySet<E extends Comparable<E>>
 		}
 	}
 
-	private Node<E> find(Node<E> start, E data)
+	private Node find(Node start, E data)
 	{
 		while( start != null ) {
 			if( data == start.data ) return start; 
@@ -205,9 +203,9 @@ public class SpecialtySet<E extends Comparable<E>>
 		return null;
 	}
 
-	private void remove(Node<E> node)
+	private void remove(Node node)
 	{
-		Node<E> replace;
+		Node replace;
 		if (node.left == null || node.right == null)
 		{
 			if (node.parent == null)
@@ -224,7 +222,7 @@ public class SpecialtySet<E extends Comparable<E>>
 			node.data = replace.data;
 		}
 
-		Node<E> parent;
+		Node parent;
 		if (replace.left != null)
 			parent = replace.left;
 		else
@@ -247,7 +245,7 @@ public class SpecialtySet<E extends Comparable<E>>
 
 	}
 
-	private void balance(Node<E> node)
+	private void balance(Node node)
 	{
 		int difference = getNodeHeight(node.right) - getNodeHeight(node.left);
 		if (difference <= -2)
@@ -261,7 +259,6 @@ public class SpecialtySet<E extends Comparable<E>>
 			{
 				node.left = rotateLeft(node.left);
 				node = rotateRight(node);
-
 			}
 		}
 		else if (difference >= 2)
@@ -285,18 +282,18 @@ public class SpecialtySet<E extends Comparable<E>>
 		}
 	}
 
-	private Node<E> getSuccessor(Node<E> node)
+	private Node getSuccessor(Node node)
 	{
 		if (node.right != null)
 		{
-			Node<E> right = node.right;
+			Node right = node.right;
 			while (right.left != null)
 				right = right.left;
 			return right;
 		}
 		else
 		{
-			Node<E> parent = node.parent;
+			Node parent = node.parent;
 			while (parent != null && node == parent.right)
 			{
 				node = parent;
@@ -306,9 +303,9 @@ public class SpecialtySet<E extends Comparable<E>>
 		}
 	}
 
-	private Node<E> rotateRight(Node<E> node)
+	private Node rotateRight(Node node)
 	{
-		Node<E> left = node.left;
+		Node left = node.left;
 		left.parent = node.parent;
 
 		node.left = left.right;
@@ -328,9 +325,9 @@ public class SpecialtySet<E extends Comparable<E>>
 		return left;
 	}
 
-	private Node<E> rotateLeft(Node<E> node)
+	private Node rotateLeft(Node node)
 	{
-		Node<E> right = node.right;
+		Node right = node.right;
 		right.parent = node.parent;
 
 		node.right = right.left;
@@ -350,7 +347,7 @@ public class SpecialtySet<E extends Comparable<E>>
 		return right;
 	}
 
-	private int getNodeHeight(Node<E> node)
+	private int getNodeHeight(Node node)
 	{
 		if (node == null)
 			return 0;
@@ -376,9 +373,51 @@ public class SpecialtySet<E extends Comparable<E>>
 	}
 
 	// TODO: Remove for submition //
-	public homework7.Data.Node<E> convertNodeTypes()
+	public homework7.Data.Node<String> convertNodeTypes()
 	{
 		return root.asOtherNode(null);
+	}
+	
+	/**
+	 * Only for debugging purposes. Gives all information about a node.
+	 * 
+	 * @param n
+	 *            The node to write information about.
+	 */
+	private void debug(Node n)
+	{
+		E l = null;
+		E r = null;
+		E p = null;
+		if (n.left != null)
+		{
+			l = n.left.data;
+		}
+		if (n.right != null)
+		{
+			r = n.right.data;
+		}
+		if (n.parent != null)
+		{
+			p = n.parent.data;
+		}
+		
+		String left = l == null ? "null" : l.toString();
+
+		System.out.println("Key: " + n + "\t\tLeft: " + l + (left.toString().length() > 1 ? "\t" : "\t\t") + "Right: " + r + "\tParent: " + p);
+
+		if (n.left != null)
+		{
+			debug(n.left);
+		}
+		if (n.right != null)
+		{
+			debug(n.right);
+		}
+	}
+	
+	public void debug() {
+		debug(root);
 	}
 
 	// ===========================================================
@@ -393,12 +432,12 @@ public class SpecialtySet<E extends Comparable<E>>
 	 * @author Peter Jensen
 	 * @version 2/22/2014
 	 */
-	class Node<E>
+	class Node
 	{
 		private E data; // The data element - cannot be changed after it is assigned
-		private Node<E> left; // Initialized to null when this object is created
-		private Node<E> right;
-		private Node<E> parent; // Parent - initialized to null
+		private Node left; // Initialized to null when this object is created
+		private Node right;
+		private Node parent; // Parent - initialized to null
 		private int height; // Height of this subtree - initialized to 0
 
 		/**
@@ -420,10 +459,10 @@ public class SpecialtySet<E extends Comparable<E>>
 			return data.toString();
 		}
 		
-		public homework7.Data.Node<E> asOtherNode(homework7.Data.Node<E> parent)
+		public homework7.Data.Node<String> asOtherNode(homework7.Data.Node<String> parent)
 		{
-			ArrayList<homework7.Data.Node<E>> children = new ArrayList<homework7.Data.Node<E>>(2);
-			homework7.Data.Node<E> node = new homework7.Data.Node<E>(data);
+			ArrayList<homework7.Data.Node<String>> children = new ArrayList<homework7.Data.Node<String>>(2);
+			homework7.Data.Node<String> node = new homework7.Data.Node<String>(data.toString());
 
 			if (left != null)
 				children.add(left.asOtherNode(node));

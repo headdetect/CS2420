@@ -56,14 +56,14 @@ public class SpecialtySetTest
 	public void test02()
 	{
 		SpecialtySet<String> s = new SpecialtySet<String>();
-		// s.add("Hello");
-		// s.add("Helloo");
-		// s.add("Hellooo");
+		s.add("Hello");
+		s.add("Helloo");
+		s.add("Hellooo");
 
 		// Bug in test, not your code, so fix the test first.
-		// assertEquals("The set should contain 'Hello': ", true, s.contains("Hello"));
-		// assertEquals("The set should contain 'Helloo': ", true, s.contains("Helloo"));
-		// assertEquals("The set should contain 'Hellooo': ", true, s.contains("Hellooo"));
+		assertEquals("The set should contain 'Hello': ", true, s.contains("Hello"));
+		assertEquals("The set should contain 'Helloo': ", true, s.contains("Helloo"));
+		assertEquals("The set should contain 'Hellooo': ", true, s.contains("Hellooo"));
 	}
 
 	/**
@@ -132,20 +132,13 @@ public class SpecialtySetTest
 				}
 			}
 		}
-		
+
 		System.out.println(totalActions);
 		System.out.println(TrackedInteger.comparisonCount);
-		
-		for(Map.Entry<String, Integer> entry : TrackedInteger.stacks.entrySet()) {
-			System.out.println(entry.getKey() + " - " + entry.getValue());
-		}
 
 		// If the specialty set is coded properly, a relatively small number of
 		// comparisons are done.
 		assertTrue("Maximum comparison count test: " + TrackedInteger.comparisonCount + " <= 63164", TrackedInteger.comparisonCount <= 63164);
-
-		// Uncomment if needed.
-
 
 	}
 
@@ -171,7 +164,7 @@ public class SpecialtySetTest
 		public int compareTo(TrackedInteger o)
 		{
 			String method = new Throwable().getStackTrace()[3].getMethodName();
-			if(!stacks.containsKey(method))
+			if (!stacks.containsKey(method))
 				stacks.put(method, 0);
 			stacks.put(method, stacks.get(method) + 1);
 			comparisonCount++;
