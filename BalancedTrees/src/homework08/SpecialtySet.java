@@ -39,7 +39,7 @@ public class SpecialtySet<E extends Comparable<E>>
 
 	// Instance variables. Students are allowed
 	// only these, do not add or change instance variables.
-	private Node root;
+	private Node<E> root;
 	private int size;
 
 	// ===========================================================
@@ -102,18 +102,12 @@ public class SpecialtySet<E extends Comparable<E>>
 	 * @param data
 	 *            a data value to be added to the set
 	 */
-	/* Implementation note:  If an element is actually added, 
-	 *   'current' will refer to the node containing the added
-	 *   data after this function, and 'last' will refer
-	 *   to the previous node (as appropriate).
-	 */
 	public void add(E data)
 	{
-		if (!contains(data))
-		{
-			root = add(root, data);
-
-		}
+		// We don't need a contains because it just ignores if it already exists //
+		Node<E> node = new Node<E>(data);
+		size++;
+		add(root, node);
 
 	}
 
@@ -123,19 +117,14 @@ public class SpecialtySet<E extends Comparable<E>>
 	 * @param data
 	 *            a data value to be removed from the set
 	 */
-	/* Implementation note:  If an element is actually removed, 
-	 *   'current' will refer to the node following the removed
-	 *   node after this function, and 'last' will refer
-	 *   to the previous node (as appropriate).
-	 */
 	public void remove(E data)
 	{
-		if (!contains(data))
+		Node<E> node = find(root, data);
+		if (node == null)
 			return;
 
+		remove(node);
 		size--;
-		root = remove(root, data);
-
 	}
 
 	// -----------------------------------------------------------
@@ -144,75 +133,235 @@ public class SpecialtySet<E extends Comparable<E>>
 	// -----------------------------------------------------------
 	// -----------------------------------------------------------
 
-	private boolean contains(Node root, E data)
+	private boolean contains(Node<E> node, E data)
 	{
-		if (root == null || size == 0)
+		if (root == null || size == 0 || node == null)
 		{
 			return false;
 		}
 
-		int direction = getDirection(data, root.data);
-		switch (direction)
-		{
-			case CURRENT:
-				return true;
-			case LEFT:
-				return contains(root.left, data);
-			case RIGHT:
-				return contains(root.right, data);
-		}
-
-		return false;
+		return find(node, data) != null;
 	}
 
-	private Node add(Node parent, E data)
+	private void add(Node<E> node, Node<E> toInsert)
 	{
-		if (parent == null)
+		if (node == null)
 		{
-			size++;
-			parent = new Node(data);
+			root = toInsert;
 		}
 		else
 		{
-			int direction = getDirection(data, parent.data);
-			if (direction == LEFT)
-				parent.left = add(parent.left, data);
-			else
-				parent.right = add(parent.right, data);
+			int direction = getDirection(toInsert.data, node.data);
 
+			if (direction == LEFT)
+			{
+				if (node.left == null)
+				{
+					node.left = toInsert;
+					toInsert.parent = node;
+					balance(node);
+				}
+				else
+				{
+					add(node.left, toInsert);
+				}
+
+			}
+			else if (direction == RIGHT)
+			{
+				if (node.right == null)
+				{
+					node.right = toInsert;
+					toInsert.parent = node;
+					balance(node);
+				}
+				else
+				{
+					add(node.right, toInsert);
+				}
+			}
+			else
+			{
+				// Already exists. Ignore //
+			}
+			
 		}
-		return parent;
 	}
 
-	private Node remove(Node parent, E data)
+	private Node<E> find(Node<E> start, E data)
 	{
-		int direction = getDirection(parent.data, data);
-		if (direction == CURRENT)
-		{
-			Node left = parent.left;
-			Node right = parent.right;
-			if(left == null && right == null)
-				return null;
-			else if(left == null)
-				return right;
-			else if(right == null) 
-				return left;
-			else {
-				Node newRoot = right;
-				Node temp = right;
-				while(temp.left != null)
-					temp = temp.left;
-				temp.left = left;
-				return newRoot;
+		while( start != null ) {
+			if( data == start.data ) return start; 
+			int direction = getDirection(data, start.data);
+			
+			if(direction == LEFT) {
+				start = start.left;
+			} else if (direction == RIGHT) {
+				start = start.right;
+			} else {
+				return start;
 			}
 		}
-		else if (direction == RIGHT)
-			parent.left = remove(parent.left, data);
+		return null;
+	}
+
+	private void remove(Node<E> node)
+	{
+		Node<E> replace;
+		if (node.left == null || node.right == null)
+		{
+			if (node.parent == null)
+			{
+				this.root = null;
+				node = null;
+				return;
+			}
+			replace = node;
+		}
 		else
-			parent.right = remove(parent.right, data);
-		
-		
-		return parent;
+		{
+			replace = getSuccessor(node);
+			node.data = replace.data;
+		}
+
+		Node<E> parent;
+		if (replace.left != null)
+			parent = replace.left;
+		else
+			parent = replace.right;
+
+		if (parent != null)
+			parent.parent = replace.parent;
+
+		if (replace.parent == null)
+			this.root = parent;
+		else
+		{
+			if (replace == replace.parent.left)
+				replace.parent.left = parent;
+			else
+				replace.parent.right = parent;
+			balance(replace.parent);
+		}
+		replace = null;
+
+	}
+
+	private void balance(Node<E> node)
+	{
+		int difference = getNodeHeight(node.right) - getNodeHeight(node.left);
+		if (difference <= -2)
+		{
+
+			if (getNodeHeight(node.left.left) >= getNodeHeight(node.left.right))
+			{
+				node = rotateRight(node);
+			}
+			else
+			{
+				node.left = rotateLeft(node.left);
+				node = rotateRight(node);
+
+			}
+		}
+		else if (difference >= 2)
+		{
+			if (getNodeHeight(node.right.right) >= getNodeHeight(node.right.left))
+			{
+				node = rotateLeft(node);
+			}
+			else
+			{
+				node.right = rotateRight(node.right);
+				node = rotateLeft(node);
+			}
+		}
+
+		if (node.parent != null)
+			balance(node.parent);
+		else {
+			root = node;
+			System.out.println("------------ Balancing finished ----------------");
+		}
+	}
+
+	private Node<E> getSuccessor(Node<E> node)
+	{
+		if (node.right != null)
+		{
+			Node<E> right = node.right;
+			while (right.left != null)
+				right = right.left;
+			return right;
+		}
+		else
+		{
+			Node<E> parent = node.parent;
+			while (parent != null && node == parent.right)
+			{
+				node = parent;
+				parent = node.parent;
+			}
+			return parent;
+		}
+	}
+
+	private Node<E> rotateRight(Node<E> node)
+	{
+		Node<E> left = node.left;
+		left.parent = node.parent;
+
+		node.left = left.right;
+
+		if (node.left != null)
+			node.left.parent = node;
+
+		left.right = node;
+		node.parent = left;
+
+		if (left.parent != null)
+			if (left.parent.right == node)
+				left.parent.right = left;
+			else if (left.parent.left == node)
+				left.parent.left = left;
+
+		return left;
+	}
+
+	private Node<E> rotateLeft(Node<E> node)
+	{
+		Node<E> right = node.right;
+		right.parent = node.parent;
+
+		node.right = right.left;
+
+		if (node.right != null)
+			node.right.parent = node;
+
+		right.left = node;
+		node.parent = right;
+
+		if (right.parent != null)
+			if (right.parent.right == node)
+				right.parent.right = right;
+			else if (right.parent.left == node)
+				right.parent.left = right;
+
+		return right;
+	}
+
+	private int getNodeHeight(Node<E> node)
+	{
+		if (node == null)
+			return 0;
+		if (node.left == null && node.right == null)
+			return 1;
+		else if (node.left == null)
+			return 1 + getNodeHeight(node.right);
+		else if (node.right == null)
+			return 1 + getNodeHeight(node.left);
+		else
+			return 1 + Math.max(getNodeHeight(node.left), getNodeHeight(node.right));
 	}
 
 	// -----------------------------------------------------------
@@ -244,11 +393,12 @@ public class SpecialtySet<E extends Comparable<E>>
 	 * @author Peter Jensen
 	 * @version 2/22/2014
 	 */
-	class Node
+	class Node<E>
 	{
 		private E data; // The data element - cannot be changed after it is assigned
-		private Node left, right; // Initialized to null when this object is created
-		private Node parent; // Parent - initialized to null
+		private Node<E> left; // Initialized to null when this object is created
+		private Node<E> right;
+		private Node<E> parent; // Parent - initialized to null
 		private int height; // Height of this subtree - initialized to 0
 
 		/**
@@ -259,7 +409,7 @@ public class SpecialtySet<E extends Comparable<E>>
 		 * @param data
 		 *            the data to store in the node
 		 */
-		Node(E data)
+		public Node(E data)
 		{
 			this.data = data;
 		}
@@ -269,7 +419,7 @@ public class SpecialtySet<E extends Comparable<E>>
 		{
 			return data.toString();
 		}
-
+		
 		public homework7.Data.Node<E> asOtherNode(homework7.Data.Node<E> parent)
 		{
 			ArrayList<homework7.Data.Node<E>> children = new ArrayList<homework7.Data.Node<E>>(2);
@@ -289,5 +439,4 @@ public class SpecialtySet<E extends Comparable<E>>
 			return node;
 		}
 	}
-
 }

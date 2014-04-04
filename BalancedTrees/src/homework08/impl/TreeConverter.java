@@ -16,8 +16,8 @@ public class TreeConverter
 	    	set.add(d + "");
 	    for(int i = 1; i < 10; i++)
 	    {
-	    	int val = random.nextInt(i);
-	        set.remove(val + "");
+	    	int val = random.nextInt(i * 10);
+	        set.add(val + "");
 	        System.out.println("Removing: " + val);
 	    }
 		TreeVisualizer.load(set.convertNodeTypes());
