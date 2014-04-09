@@ -5,8 +5,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Random;
+
 
 /**
  * Objects of this class represent a set of sortable values. The set has the following performance characteristics:
@@ -31,7 +30,6 @@ public class SpecialtySet<E extends Comparable<E>>
 	// ===========================================================
 
 	private static final int LEFT = -1;
-
 	private static final int RIGHT = 1;
 
 	// ===========================================================
@@ -492,51 +490,12 @@ public class SpecialtySet<E extends Comparable<E>>
 		return (int) Math.signum(toCheck.compareTo(data));
 	}
 
-	/*
-	 * Converts all nodes into a homework07.Node to be used in TreeVisualizationPanel
-	 */
-	public homework7.Data.Node<String> convertNodeTypes()
-	{
-		return root.asOtherNode(null);
-	}
-
 	/**
-	 * Prints the attributes of the nodes. For debugs.
+	 * Writes the tree to a .tree file.
+	 *
+	 * @param f the f
+	 * @throws IOException Signals that an I/O exception has occurred.
 	 */
-	private void printSet(Node n)
-	{
-		E l = null;
-		E r = null;
-		E p = null;
-
-		if (n.left != null)
-			l = n.left.data;
-
-		if (n.right != null)
-			r = n.right.data;
-
-		if (n.parent != null)
-			p = n.parent.data;
-
-		String left = l == null ? "null" : l.toString();
-
-		System.out.println("Value: " + n + "\tHeight: " + n.height + "\t\tLeft: " + l + (left.toString().length() > 1 ? "\t" : "\t\t") + "Right: " + r + "\tParent: " + p);
-
-		if (n.left != null)
-			printSet(n.left);
-
-		if (n.right != null)
-			printSet(n.right);
-	}
-
-	/**
-	 * Prints the attributes of the nodes. For debugs.
-	 */
-	public void printSet()
-	{
-		printSet(root);
-	}
-
 	public void writeFile(File f) throws IOException
 	{
 		if (!f.exists())
@@ -549,12 +508,18 @@ public class SpecialtySet<E extends Comparable<E>>
 	}
 
 	private int currSpaces;
-	private HashMap<Integer, String> index = new HashMap<Integer, String>();
-
+	private int index;
+	
+	/**
+	 * Writes the tree to a .tree file.
+	 *
+	 * @param out the out
+	 * @param node the node
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 */
 	private void writeNode(BufferedWriter out, Node node) throws IOException
 	{
-		int key = getRandomKey();
-		index.put(key, node.data.toString());
+		int key = ++index;
 
 		out.append(getSpaces() + "<" + key + " " + node.data.toString() + ">\n");
 		currSpaces += 3;
@@ -566,6 +531,11 @@ public class SpecialtySet<E extends Comparable<E>>
 		out.append(getSpaces() + "</" + key + ">\n");
 	}
 
+	/**
+	 * Get spaces based on currSpaces
+	 *
+	 * @return the spaces
+	 */
 	private String getSpaces()
 	{
 		char[] spaces = new char[currSpaces];
@@ -574,14 +544,6 @@ public class SpecialtySet<E extends Comparable<E>>
 		return new String(spaces);
 	}
 
-	private int getRandomKey()
-	{
-		Random r = new Random();
-		int val = r.nextInt(Math.max(size, 100));
-		while (index.containsKey(val))
-			val = r.nextInt(Math.max(size, 100));
-		return val;
-	}
 
 	// ===========================================================
 	// Inner and Anonymous Classes
@@ -623,26 +585,5 @@ public class SpecialtySet<E extends Comparable<E>>
 			return data.toString();
 		}
 
-		/* 
-		 * Converts homework08.Node to a homework07.Node to be used in the TreeVisualizationPanel
-		 */
-		public homework7.Data.Node<String> asOtherNode(homework7.Data.Node<String> parent)
-		{
-			ArrayList<homework7.Data.Node<String>> children = new ArrayList<homework7.Data.Node<String>>(2);
-			homework7.Data.Node<String> node = new homework7.Data.Node<String>(data.toString());
-
-			if (left != null)
-				children.add(left.asOtherNode(node));
-
-			if (right != null)
-				children.add(right.asOtherNode(node));
-
-			if (parent != null)
-				node.setParent(parent);
-
-			node.setChildren(children);
-
-			return node;
-		}
 	}
 }

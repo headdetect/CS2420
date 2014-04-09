@@ -257,7 +257,7 @@ public class SpecialtySetTest
 
 		try
 		{
-			s.writeFile(new File("quickfox.tree"));
+			s.writeFile(new File("test.tree"));
 		}
 		catch (IOException e)
 		{

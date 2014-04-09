@@ -1,7 +1,6 @@
 package homework08.impl;
 
 import homework08.SpecialtySet;
-import homework7.TreeVisualizer;
 
 import java.util.Random;
 
@@ -23,8 +22,8 @@ public class TreeConverter
 	    	//set.insert(val);
 	        System.out.println("Removing: " + val);
 	    }
-	    set.printSet();
-		TreeVisualizer.load(set.convertNodeTypes());
+	    //set.printSet();
+		//TreeVisualizer.load(set.convertNodeTypes());
 	}
 	
 
