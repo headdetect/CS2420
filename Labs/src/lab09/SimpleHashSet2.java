@@ -22,7 +22,7 @@ package lab09;
  * @author Peter Jensen
  * @version Spring 2014
  */
-public class SimpleHashSet {
+public class SimpleHashSet2 {
 	// Instance variables.
 
 	private Object[] table;
@@ -35,7 +35,7 @@ public class SimpleHashSet {
 	 * @param capacity
 	 *            the size of the hash table
 	 */
-	public SimpleHashSet(int capacity) {
+	public SimpleHashSet2(int capacity) {
 		this.capacity = capacity;
 		this.table = new Object[capacity];
 		this.probeCount = 0;
