@@ -28,6 +28,7 @@ public class SimpleHashSet {
 	private Object[] table;
 	private int capacity;
 	private int probeCount;
+	private int size;
 
 	/**
 	 * Builds a hash set with the specified maximum size.
@@ -64,6 +65,7 @@ public class SimpleHashSet {
 			probeCount++;
 			if (val == null) {
 				table[pos] = element;
+				size++;
 				return;
 			}
 			if (val.equals(element))
@@ -180,6 +182,7 @@ public class SimpleHashSet {
 		// Clear the free position.
 
 		table[freePosition] = null;
+		size--;
 	}
 
 	/**
@@ -210,6 +213,10 @@ public class SimpleHashSet {
 	 */
 	public void resetProbeCount() {
 		probeCount = 0;
+	}
+	
+	public int size() {
+		return size;
 	}
 
 	/**
