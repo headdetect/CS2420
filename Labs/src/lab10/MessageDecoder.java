@@ -23,12 +23,14 @@ public class MessageDecoder
 			
 			for (int i = 0; i < bytes.length; i++)
 			{
+				
 				int bytePos = i / 8;
 				int bitPos = i % 8;
 				byte thisByte = bytes[i];
-				
+				thisByte = (byte) ((thisByte >> 2) & 0x1);
 				if(bitPos == 0) current = 0x00;
-				current |= (((thisByte >> bitPos) & 1) << bitPos);
+				
+				current = (byte) (current | (thisByte << bitPos));
 				newBytes[bytePos] = (byte)(current & 0xFF);
 			}
 			
@@ -41,4 +43,5 @@ public class MessageDecoder
 			e.printStackTrace();
 		}
 	}
+	
 }
