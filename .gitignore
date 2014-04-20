@@ -5,3 +5,5 @@ extracredit01
 /Labs/bin/lab02/*.class
 
 *.class
+
+bin
