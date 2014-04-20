@@ -34,7 +34,9 @@ public class HuffmanToken
      */   
     public HuffmanToken (byte value)
     {
-	// Stubbed out
+		frequency = 1;
+		this.value = value;
+		code = new ArrayList<Boolean>();
     }
     
     /**
@@ -42,7 +44,7 @@ public class HuffmanToken
      */   
     public void incrementFrequency ()
     {
-	// Stubbed out
+		frequency++;
     }
     
     /**
@@ -52,8 +54,7 @@ public class HuffmanToken
      */   
     public int getFrequency ()
     {
-	// Stubbed out
-        return 0;
+        return frequency;
     }
     
     /**
@@ -63,7 +64,7 @@ public class HuffmanToken
      */   
     public void setFrequency (int frequency)
     {
-	// Stubbed out
+		this.frequency = frequency;
     }
     
     /**
@@ -73,8 +74,7 @@ public class HuffmanToken
      */   
     public byte getValue ()
     {
-	// Stubbed out
-        return 0;
+        return value;
     }
     
     /**
@@ -85,7 +85,7 @@ public class HuffmanToken
      */   
     public void prependBitToCode (Boolean bit)
     {
-	// Stubbed out
+    	code.add(0, bit);
     }
     
     /**
@@ -97,8 +97,7 @@ public class HuffmanToken
      */   
     public ArrayList<Boolean> getCode ()
     {
-	// Stubbed out
-        return null;
+    	return code;
     }
 }
 
