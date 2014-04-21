@@ -28,8 +28,9 @@ public class CompressionTests
 
 	private void doTestAppature(byte[] orig, byte[] compressed, String file)
 	{
-		System.out.println(file + "\t" + orig.length + "\t" + compressed.length + "\t" + (orig.length / compressed.length * 100));
+		System.out.println(file + "\t" + orig.length + "\t" + compressed.length + "\t" + ((float)orig.length / (float)compressed.length * 100));
 		assertTrue(compressed.length < orig.length);
+		
 	}
 
 }

@@ -2,6 +2,7 @@ package homework10;
 
 import java.io.*;
 import java.util.*;
+import java.util.Map.Entry;
 
 /**
  * A HuffmanCompressor object contains no data - it is just an implementation of the Compressor interface. It contains the compress and decompress methods, along with a series of
@@ -40,8 +41,18 @@ public class HuffmanCompressor implements Compressor
 	 */
 	public ArrayList<HuffmanToken> countTokens(byte[] data)
 	{
-		// Stubbed out
-		return null;
+		HashMap<Byte, HuffmanToken> tokens = new HashMap<Byte, HuffmanToken>();
+		for (byte b : data)
+		{
+			if (!tokens.containsKey(b))
+				tokens.put(b, new HuffmanToken(b));
+			else
+				tokens.get(b).incrementFrequency();
+		}
+		ArrayList<HuffmanToken> tokensList = new ArrayList<HuffmanToken>();
+		for (Entry<Byte, HuffmanToken> entry : tokens.entrySet())
+			tokensList.add(entry.getValue());
+		return tokensList;
 	}
 
 	/**
@@ -59,8 +70,24 @@ public class HuffmanCompressor implements Compressor
 	 */
 	public HuffmanNode buildHuffmanCodeTree(ArrayList<HuffmanToken> tokens)
 	{
-		// Stubbed out
-		return null;
+		PriorityQueue<HuffmanNode> mQueue = new PriorityQueue<HuffmanNode>();
+
+		for (HuffmanToken token : tokens)
+		{
+			HuffmanNode node = new HuffmanNode(token);
+			mQueue.add(node);
+		}
+
+		int ogSize = mQueue.size();
+		for (int i = 0; i < ogSize - 1; i++)
+		{
+			HuffmanNode left = mQueue.poll();
+			HuffmanNode right = mQueue.poll();
+			HuffmanNode parent = new HuffmanNode(left, right);
+			mQueue.add(parent);
+		}
+
+		return mQueue.poll();
 	}
 
 	/**
@@ -74,8 +101,44 @@ public class HuffmanCompressor implements Compressor
 	 */
 	public Map<Byte, ArrayList<Boolean>> createEncodingMap(ArrayList<HuffmanToken> tokens)
 	{
-		// Stubbed out
-		return null;
+		Map<Byte, ArrayList<Boolean>> elMappo = new HashMap<Byte, ArrayList<Boolean>>();
+		HuffmanNode root = buildHuffmanCodeTree(tokens);
+		for (HuffmanToken token : tokens)
+		{
+			ArrayList<Boolean> bits = getCompressedValue(token.getValue(), new ArrayList<Boolean>(), root);
+			token.setCode(bits);
+			elMappo.put(token.getValue(), bits);
+		}
+
+		return elMappo;
+	}
+
+	private ArrayList<Boolean> getCompressedValue(Byte token, ArrayList<Boolean> toBuild, HuffmanNode node)
+	{
+		if (node == null || node.getToken() == null)
+		{
+			return toBuild;
+		}
+
+		int dir = Byte.compare(token, node.getToken().getValue());
+
+		if (dir < 0)
+		{
+			toBuild.add(false);
+			return getCompressedValue(token, toBuild, node.getLeftSubtree());
+		}
+
+		else if (dir > 0)
+		{
+			toBuild.add(true);
+			return getCompressedValue(token, toBuild, node.getRightSubtree());
+		}
+
+		else
+		{
+			return toBuild;
+		}
+
 	}
 
 	/**
@@ -94,8 +157,14 @@ public class HuffmanCompressor implements Compressor
 	 */
 	public ArrayList<Boolean> encodeBytes(byte[] data, Map<Byte, ArrayList<Boolean>> encodingMap)
 	{
-		// Stubbed out
-		return null;
+		ArrayList<Boolean> finalEncoding = new ArrayList<Boolean>();
+
+		for (byte b : data)
+		{
+			finalEncoding.addAll(encodingMap.get(b));
+		}
+
+		return finalEncoding;
 	}
 
 	/**
@@ -144,10 +213,11 @@ public class HuffmanCompressor implements Compressor
 	{
 		// Variable initialization and compression steps stubbed out here.
 
-		ArrayList<HuffmanToken> tokens = new ArrayList<HuffmanToken>();
+		ArrayList<HuffmanToken> tokens = countTokens(data);
+		Map<Byte, ArrayList<Boolean>> charMap = createEncodingMap(tokens);
+		ArrayList<Boolean> encodedBits = encodeBytes(data, charMap);
 
 		HuffmanTools.dumpHuffmanCodes(tokens); // Useful for debugging
-
 		// You need to set up the appropriate variables before this code begins. This
 		// code will place various data elements of the compressed data into
 		// a byte array for you.
@@ -193,6 +263,10 @@ public class HuffmanCompressor implements Compressor
 
 		// You need to set up the appropriate variables before this code begins. This
 		// code will extract various data elements from the compressedData bytes for you.
+
+		int dataLength;
+		ArrayList<HuffmanToken> tokens;
+		ArrayList<Boolean> encodedBits;
 
 		try
 		{

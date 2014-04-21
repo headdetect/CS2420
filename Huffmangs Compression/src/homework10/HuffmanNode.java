@@ -12,15 +12,13 @@ import java.util.*;
  */
 public class HuffmanNode implements Comparable<HuffmanNode>
 {
-	// The sum of all the frequencies in all the leaf nodes at or below
-	// this node.
-	private int totalFrequency;
-
 	// A list of all the tokens contained at or below this node.
-	private ArrayList<HuffmanToken> tokens;
+	private HuffmanToken token;
 
 	// The left and right children of this node.
 	private HuffmanNode left, right;
+
+	private int totalFrequency;
 
 	/**
 	 * This constructor creates a leaf node in the Huffman tree. A leaf node in a Huffman tree is mapped to a single token. Use this token to initialize the frequency in this node.
@@ -30,9 +28,7 @@ public class HuffmanNode implements Comparable<HuffmanNode>
 	 */
 	public HuffmanNode(HuffmanToken token)
 	{
-		tokens = new ArrayList<HuffmanToken>();
-		tokens.add(token);
-		totalFrequency = token.getFrequency();
+		this.token = token;
 	}
 
 	/**
@@ -53,19 +49,17 @@ public class HuffmanNode implements Comparable<HuffmanNode>
 	 */
 	public HuffmanNode(HuffmanNode left, HuffmanNode right)
 	{
-		tokens = new ArrayList<HuffmanToken>();
-		
 		this.left = left;
 		this.right = right;
 
-		if (left != null) {
+		if (left != null)
+		{
 			totalFrequency += left.totalFrequency;
-			tokens.addAll(left.tokens);
 		}
 
-		if (right != null) {
+		if (right != null)
+		{
 			totalFrequency += right.totalFrequency;
-			tokens.addAll(right.tokens);
 		}
 	}
 
@@ -104,12 +98,10 @@ public class HuffmanNode implements Comparable<HuffmanNode>
 	 * 
 	 * @return The token stored in this leaf node
 	 */
-	public HuffmanToken getToken ()
-    {
-    	if(!isLeafNode())
-    		return null;
-    	return tokens.get(0);
-    }
+	public HuffmanToken getToken()
+	{
+		return token;
+	}
 
 	/**
 	 * This method assumes that a HuffmanNode is stored in Object o. (Note that a typecast is required in the method below.) True is returned if this node is identical to the node
@@ -141,7 +133,16 @@ public class HuffmanNode implements Comparable<HuffmanNode>
 	{
 		HuffmanToken tokenA = getToken();
 		HuffmanToken tokenB = node.getToken();
-		
+
+		if (tokenA == null)
+			return 1;
+
+		if (tokenB == null)
+			return -1;
+
+		if (tokenA.getValue() == tokenB.getValue())
+			return Integer.compare(tokenA.getFrequency(), tokenB.getFrequency());
+
 		return Byte.compare(tokenA.getValue(), tokenB.getValue());
 	}
 }
