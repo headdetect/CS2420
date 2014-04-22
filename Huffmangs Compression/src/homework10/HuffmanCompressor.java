@@ -70,7 +70,7 @@ public class HuffmanCompressor implements Compressor
 	 */
 	public HuffmanNode buildHuffmanCodeTree(ArrayList<HuffmanToken> tokens)
 	{
-		PriorityQueue<HuffmanNode> mQueue = new PriorityQueue<HuffmanNode>();
+		PriorityQueue<HuffmanNode> mQueue = new PriorityQueue<HuffmanNode>(100);
 
 		for (HuffmanToken token : tokens)
 		{
@@ -105,40 +105,34 @@ public class HuffmanCompressor implements Compressor
 		HuffmanNode root = buildHuffmanCodeTree(tokens);
 		for (HuffmanToken token : tokens)
 		{
-			ArrayList<Boolean> bits = getCompressedValue(token.getValue(), new ArrayList<Boolean>(), root);
-			token.setCode(bits);
-			elMappo.put(token.getValue(), bits);
+			getCompressedValue(token.getValue(), new ArrayList<Boolean>(), elMappo, root);
 		}
 
 		return elMappo;
 	}
 
-	private ArrayList<Boolean> getCompressedValue(Byte token, ArrayList<Boolean> toBuild, HuffmanNode node)
+	private void getCompressedValue(Byte token, ArrayList<Boolean> toBuild, Map<Byte, ArrayList<Boolean>> map, HuffmanNode node)
 	{
-		if (node == null || node.getToken() == null)
+		if (node == null)
+			return;
+
+		if (node.getToken() != null && node.getToken().getValue() == token)
 		{
-			return toBuild;
+			node.getToken().setCode(toBuild);
+			map.put(token, toBuild);
+			return;
 		}
+		
+		getCompressedValue(token, addAndReturn(false, toBuild), map, node.getLeftSubtree());
+		getCompressedValue(token, addAndReturn(true, toBuild), map, node.getRightSubtree());
 
-		int dir = Byte.compare(token, node.getToken().getValue());
+	}
 
-		if (dir < 0)
-		{
-			toBuild.add(false);
-			return getCompressedValue(token, toBuild, node.getLeftSubtree());
-		}
-
-		else if (dir > 0)
-		{
-			toBuild.add(true);
-			return getCompressedValue(token, toBuild, node.getRightSubtree());
-		}
-
-		else
-		{
-			return toBuild;
-		}
-
+	private <T> ArrayList<T> addAndReturn(T item, ArrayList<T> list)
+	{
+		ArrayList<T> newList = new ArrayList<T>(list);
+		newList.add(item);
+		return newList;
 	}
 
 	/**

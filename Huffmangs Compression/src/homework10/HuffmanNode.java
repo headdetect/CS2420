@@ -140,9 +140,6 @@ public class HuffmanNode implements Comparable<HuffmanNode>
 		if (tokenB == null)
 			return -1;
 
-		if (tokenA.getValue() == tokenB.getValue())
-			return Integer.compare(tokenA.getFrequency(), tokenB.getFrequency());
-
-		return Byte.compare(tokenA.getValue(), tokenB.getValue());
+		return Integer.compare(tokenA.getFrequency(), tokenB.getFrequency());
 	}
 }
