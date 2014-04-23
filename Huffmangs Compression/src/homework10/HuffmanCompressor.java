@@ -19,12 +19,19 @@ public class HuffmanCompressor implements Compressor
 	// to get data to or from the methods, use a parameter! (Of course,
 	// you shouldn't need to add any, the definitions below are complete.)
 
+	private boolean debug = false;
+
 	/**
 	 * This constructor does nothing. There are no fields to initialize. It is provided simply for testing. (You must make a HuffmanCompressor object in order to test the compress
 	 * and decompress methods.)
 	 */
 	public HuffmanCompressor()
 	{
+	}
+
+	public HuffmanCompressor(boolean debug)
+	{
+		this.debug = debug;
 	}
 
 	/**
@@ -70,7 +77,7 @@ public class HuffmanCompressor implements Compressor
 	 */
 	public HuffmanNode buildHuffmanCodeTree(ArrayList<HuffmanToken> tokens)
 	{
-		PriorityQueue<HuffmanNode> mQueue = new PriorityQueue<HuffmanNode>(100);
+		PriorityQueue<HuffmanNode> mQueue = new PriorityQueue<HuffmanNode>();
 
 		for (HuffmanToken token : tokens)
 		{
@@ -78,16 +85,16 @@ public class HuffmanCompressor implements Compressor
 			mQueue.add(node);
 		}
 
-		int ogSize = mQueue.size();
-		for (int i = 0; i < ogSize - 1; i++)
+		while (mQueue.size() > 1)
 		{
-			HuffmanNode left = mQueue.poll();
-			HuffmanNode right = mQueue.poll();
+			HuffmanNode left = mQueue.remove();
+			HuffmanNode right = mQueue.remove();
 			HuffmanNode parent = new HuffmanNode(left, right);
-			mQueue.add(parent);
+
+			mQueue.offer(parent);
 		}
 
-		return mQueue.poll();
+		return mQueue.element();
 	}
 
 	/**
@@ -103,28 +110,26 @@ public class HuffmanCompressor implements Compressor
 	{
 		Map<Byte, ArrayList<Boolean>> elMappo = new HashMap<Byte, ArrayList<Boolean>>();
 		HuffmanNode root = buildHuffmanCodeTree(tokens);
-		for (HuffmanToken token : tokens)
-		{
-			getCompressedValue(token.getValue(), new ArrayList<Boolean>(), elMappo, root);
-		}
+
+		buildMap(new ArrayList<Boolean>(), elMappo, root);
 
 		return elMappo;
 	}
 
-	private void getCompressedValue(Byte token, ArrayList<Boolean> toBuild, Map<Byte, ArrayList<Boolean>> map, HuffmanNode node)
+	private void buildMap(ArrayList<Boolean> toBuild, Map<Byte, ArrayList<Boolean>> map, HuffmanNode node)
 	{
-		if (node == null)
-			return;
 
-		if (node.getToken() != null && node.getToken().getValue() == token)
+		if (node.getLeftSubtree() != null)
+			buildMap(addAndReturn(false, toBuild), map, node.getLeftSubtree());
+
+		if (node.getRightSubtree() != null)
+			buildMap(addAndReturn(true, toBuild), map, node.getRightSubtree());
+
+		if (node.getToken() != null)
 		{
 			node.getToken().setCode(toBuild);
-			map.put(token, toBuild);
-			return;
+			map.put(node.getToken().getValue(), toBuild);
 		}
-		
-		getCompressedValue(token, addAndReturn(false, toBuild), map, node.getLeftSubtree());
-		getCompressedValue(token, addAndReturn(true, toBuild), map, node.getRightSubtree());
 
 	}
 
@@ -211,10 +216,8 @@ public class HuffmanCompressor implements Compressor
 		Map<Byte, ArrayList<Boolean>> charMap = createEncodingMap(tokens);
 		ArrayList<Boolean> encodedBits = encodeBytes(data, charMap);
 
-		HuffmanTools.dumpHuffmanCodes(tokens); // Useful for debugging
-		// You need to set up the appropriate variables before this code begins. This
-		// code will place various data elements of the compressed data into
-		// a byte array for you.
+		if (debug)
+			HuffmanTools.dumpHuffmanCodes(tokens);
 
 		try
 		{
@@ -280,7 +283,8 @@ public class HuffmanCompressor implements Compressor
 
 		// Decompression steps stubbed out here.
 
-		HuffmanTools.dumpHuffmanCodes(tokens); // Useful for debugging
+		if (debug)
+			HuffmanTools.dumpHuffmanCodes(tokens); // Useful for debugging
 
 		// Return statement stubbed out.
 		return null;

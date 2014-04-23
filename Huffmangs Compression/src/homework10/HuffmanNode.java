@@ -29,6 +29,7 @@ public class HuffmanNode implements Comparable<HuffmanNode>
 	public HuffmanNode(HuffmanToken token)
 	{
 		this.token = token;
+		this.totalFrequency = token.getFrequency();
 	}
 
 	/**
@@ -52,15 +53,7 @@ public class HuffmanNode implements Comparable<HuffmanNode>
 		this.left = left;
 		this.right = right;
 
-		if (left != null)
-		{
-			totalFrequency += left.totalFrequency;
-		}
-
-		if (right != null)
-		{
-			totalFrequency += right.totalFrequency;
-		}
+		totalFrequency = left.totalFrequency + right.totalFrequency;
 	}
 
 	/**
@@ -131,15 +124,19 @@ public class HuffmanNode implements Comparable<HuffmanNode>
 	 */
 	public int compareTo(HuffmanNode node)
 	{
-		HuffmanToken tokenA = getToken();
-		HuffmanToken tokenB = node.getToken();
+		if(node.token != null && token != null && node.token.equals(token))
+			return 0;
+		
+		if(this.totalFrequency == node.totalFrequency && token != null && node.token != null)
+			return (int)Math.signum(Byte.compare(token.getValue(), node.token.getValue()));
+		
+		return (int)Math.signum(Integer.compare(this.totalFrequency, node.totalFrequency));
+	}
 
-		if (tokenA == null)
-			return 1;
-
-		if (tokenB == null)
-			return -1;
-
-		return Integer.compare(tokenA.getFrequency(), tokenB.getFrequency());
+	public String toString()
+	{
+		if (getToken() != null)
+			return getToken().toString();
+		return "<No Token>";
 	}
 }
