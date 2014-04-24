@@ -10,17 +10,27 @@ import java.util.Map.Entry;
  * 
  * The only methods that should be public are the constructor and the Compressor interface methods, the rest should be private. I have left them public, though, for testing.
  * 
- * @author Peter Jensen - CS 2420
+ * @author Peter Jensen & Brayden Lopez - CS 2420
  * @version Spring 2014
  */
 public class HuffmanCompressor implements Compressor
 {
-	// There are NO fields in the compressor class. If you need
-	// to get data to or from the methods, use a parameter! (Of course,
-	// you shouldn't need to add any, the definitions below are complete.)
 
+	// ===========================================================
+	// Constants
+	// ===========================================================
+
+	// ===========================================================
+	// Fields
+	// ===========================================================
+
+	// If true, it will output the tokens when it builds them //
 	private boolean debug = false;
 
+	// ===========================================================
+	// Constructors
+	// ===========================================================
+	
 	/**
 	 * This constructor does nothing. There are no fields to initialize. It is provided simply for testing. (You must make a HuffmanCompressor object in order to test the compress
 	 * and decompress methods.)
@@ -31,8 +41,128 @@ public class HuffmanCompressor implements Compressor
 
 	public HuffmanCompressor(boolean debug)
 	{
+		// If true, it will output the tokens when it builds them //
 		this.debug = debug;
 	}
+
+	// ===========================================================
+	// Getter & Setter
+	// ===========================================================
+
+	// ===========================================================
+	// Methods for/from SuperClass/Interfaces
+	// ===========================================================
+	
+
+	/**
+	 * Given any array of bytes that contain some data, this method returns a compressed form of the original data. The returned, compressed bytes must contain sufficient
+	 * information so that the decompress method below can reconstruct the original data.
+	 * 
+	 * Huffman coding is used to compress the data.
+	 * <p>
+	 * &nbsp;
+	 * <p>
+	 * 
+	 * Some of the code for this method has been provided for you. You should figure out what it does, it will significantly help you.
+	 * 
+	 * @param compressedData
+	 *            An array of bytes that contains some data that should be compressed
+	 * @return An array of bytes that contains the compressed form of the original data
+	 */
+	@Override
+	public byte[] compress(byte[] data)
+	{
+		ArrayList<HuffmanToken> tokens = countTokens(data);
+		Map<Byte, ArrayList<Boolean>> charMap = createEncodingMap(tokens);
+		ArrayList<Boolean> encodedBits = encodeBytes(data, charMap);
+
+		if (debug)
+			HuffmanTools.dumpHuffmanCodes(tokens);
+
+		try
+		{
+			ByteArrayOutputStream byteOutput = new ByteArrayOutputStream();
+			DataOutputStream output = new DataOutputStream(byteOutput);
+
+			// Write the length of the compressed data //
+			output.writeInt(data.length);
+
+			// Write the list of tokens to the output stream //
+			writeTokenList(output, tokens);
+
+			// Write the compressed data //
+			writeBitCodes(output, encodedBits);
+
+			return byteOutput.toByteArray();
+		}
+		catch (IOException e)
+		{
+			System.out.println("Fatal compression error: " + e.getMessage());
+			e.printStackTrace();
+			return new byte[0];
+		}
+
+	}
+
+	/**
+	 * Given an array of bytes that contain compressed data that was compressed using this compressor, this method will reconstruct and return the original, uncompressed data. The
+	 * compressed bytes must contain sufficient information so that this method can reconstruct the original data bytes.
+	 * 
+	 * Huffman coding is used to decompress the data.
+	 * <p>
+	 * &nbsp;
+	 * <p>
+	 * 
+	 * Some of the code for this method has been provided for you. You should figure out what it does, it will significantly help you.
+	 * 
+	 * @param compressedData
+	 *            An array of bytes that contains some data in compressed form
+	 * @return An array of bytes that contains the original, uncompressed data
+	 */
+	@Override
+	public byte[] decompress(byte[] compressedData)
+	{
+		int dataLength;
+		ArrayList<HuffmanToken> tokens;
+		ArrayList<Boolean> encodedBits;
+
+		try
+		{
+			ByteArrayInputStream byteInput = new ByteArrayInputStream(compressedData);
+			DataInputStream input = new DataInputStream(byteInput);
+
+			// Get the length of the data //
+			dataLength = input.readInt();
+
+			// Read the list of tokens //
+			tokens = readTokenList(input);
+
+			// Get the compressed data //
+			encodedBits = readBitCodes(input);
+
+			// Build tree from the list of tokens //
+			HuffmanNode root = buildHuffmanCodeTree(tokens);
+
+			if (debug)
+				HuffmanTools.dumpHuffmanCodes(tokens); // Useful for debugging
+
+			// Decompress the bits based on the tree of HuffmanTokens //
+			return decodeBits(encodedBits, root, dataLength);
+		}
+		catch (IOException e)
+		{
+			System.out.println("Fatal compression error: " + e.getMessage());
+			e.printStackTrace();
+			return null;
+		}
+	}
+
+
+	// ===========================================================
+	// Methods
+	// ===========================================================
+	
+	
 
 	/**
 	 * This helper method counts the number of times each data value occurs in the given byte array. For each different value, a HuffmanToken is created and stored. When the same
@@ -46,8 +176,9 @@ public class HuffmanCompressor implements Compressor
 	 *            A list of data bytes
 	 * @return A list of HuffmanTokens that contain token counts
 	 */
-	public ArrayList<HuffmanToken> countTokens(byte[] data)
+	private ArrayList<HuffmanToken> countTokens(byte[] data)
 	{
+		// Build a map of tokens, based on a key of bytes //
 		HashMap<Byte, HuffmanToken> tokens = new HashMap<Byte, HuffmanToken>();
 		for (byte b : data)
 		{
@@ -56,9 +187,12 @@ public class HuffmanCompressor implements Compressor
 			else
 				tokens.get(b).incrementFrequency();
 		}
+
+		// Transform the map into an array list //
 		ArrayList<HuffmanToken> tokensList = new ArrayList<HuffmanToken>();
 		for (Entry<Byte, HuffmanToken> entry : tokens.entrySet())
 			tokensList.add(entry.getValue());
+
 		return tokensList;
 	}
 
@@ -75,7 +209,7 @@ public class HuffmanCompressor implements Compressor
 	 *            A list of Tokens, each one with a frequency count
 	 * @return The root node of a Huffman tree
 	 */
-	public HuffmanNode buildHuffmanCodeTree(ArrayList<HuffmanToken> tokens)
+	private HuffmanNode buildHuffmanCodeTree(ArrayList<HuffmanToken> tokens)
 	{
 		PriorityQueue<HuffmanNode> mQueue = new PriorityQueue<HuffmanNode>();
 
@@ -85,6 +219,7 @@ public class HuffmanCompressor implements Compressor
 			mQueue.add(node);
 		}
 
+		// PQueue is already in order, just traverse the queue and rebuilt as a tree //
 		while (mQueue.size() > 1)
 		{
 			HuffmanNode left = mQueue.remove();
@@ -106,7 +241,7 @@ public class HuffmanCompressor implements Compressor
 	 *            A list of Tokens, each one with a Huffman code
 	 * @return A map that maps byte values to their Huffman codes
 	 */
-	public Map<Byte, ArrayList<Boolean>> createEncodingMap(ArrayList<HuffmanToken> tokens)
+	private Map<Byte, ArrayList<Boolean>> createEncodingMap(ArrayList<HuffmanToken> tokens)
 	{
 		Map<Byte, ArrayList<Boolean>> elMappo = new HashMap<Byte, ArrayList<Boolean>>();
 		HuffmanNode root = buildHuffmanCodeTree(tokens);
@@ -140,6 +275,8 @@ public class HuffmanCompressor implements Compressor
 		return newList;
 	}
 
+	
+
 	/**
 	 * This helper method encodes an array of data bytes as an ArrayList of bits (Boolean values). Huffman codes are used to translate the bytes into bits.
 	 * <p>
@@ -154,7 +291,7 @@ public class HuffmanCompressor implements Compressor
 	 *            A map that maps byte values to Huffman codes (bits)
 	 * @return An ArrayList of bits (Booleans) that represent the compressed (Huffman encoded) data
 	 */
-	public ArrayList<Boolean> encodeBytes(byte[] data, Map<Byte, ArrayList<Boolean>> encodingMap)
+	private ArrayList<Boolean> encodeBytes(byte[] data, Map<Byte, ArrayList<Boolean>> encodingMap)
 	{
 		ArrayList<Boolean> finalEncoding = new ArrayList<Boolean>();
 
@@ -187,7 +324,7 @@ public class HuffmanCompressor implements Compressor
 	 *            The number of bytes that will be in the decoded byte array
 	 * @return An array of bytes that represent the uncompressed data
 	 */
-	public byte[] decodeBits(ArrayList<Boolean> bitCodes, HuffmanNode codeTree, int dataLength)
+	private byte[] decodeBits(ArrayList<Boolean> bitCodes, HuffmanNode codeTree, int dataLength)
 	{
 		ByteArrayOutputStream byteOutput = new ByteArrayOutputStream(dataLength);
 		DataOutputStream output = new DataOutputStream(byteOutput);
@@ -198,7 +335,7 @@ public class HuffmanCompressor implements Compressor
 		{
 			while (output.size() < dataLength)
 			{
-				if(index >= bitCodes.size())
+				if (index >= bitCodes.size())
 				{
 					output.write(currentNode.getToken().getValue());
 					currentNode = codeTree;
@@ -206,6 +343,8 @@ public class HuffmanCompressor implements Compressor
 				}
 				if (!bitCodes.get(index))
 				{
+					// Bit read was 0, go left //
+
 					if (currentNode.getToken() == null)
 					{
 						currentNode = currentNode.getLeftSubtree();
@@ -219,6 +358,8 @@ public class HuffmanCompressor implements Compressor
 				}
 				else
 				{
+					// Bit read was 1, go right //
+
 					if (currentNode.getToken() == null)
 					{
 						currentNode = currentNode.getRightSubtree();
@@ -237,128 +378,62 @@ public class HuffmanCompressor implements Compressor
 		{
 			e.printStackTrace();
 		}
-		
+
 		return byteOutput.toByteArray();
 	}
+	
+	// ----- IO Operations ----- //
+	
 
 	/**
-	 * Given any array of bytes that contain some data, this method returns a compressed form of the original data. The returned, compressed bytes must contain sufficient
-	 * information so that the decompress method below can reconstruct the original data.
+	 * This helper method writes the list of Huffman tokens to the specified output stream.
 	 * 
-	 * Huffman coding is used to compress the data.
-	 * <p>
-	 * &nbsp;
-	 * <p>
-	 * 
-	 * Some of the code for this method has been provided for you. You should figure out what it does, it will significantly help you.
-	 * 
-	 * @param compressedData
-	 *            An array of bytes that contains some data that should be compressed
-	 * @return An array of bytes that contains the compressed form of the original data
+	 * @param output
+	 *            the output stream
+	 * @param tokens
+	 *            the tokens to output
+	 * @throws IOException
+	 *             Signals that an I/O exception has occurred.
 	 */
-	public byte[] compress(byte[] data)
+	private void writeTokenList(DataOutputStream output, ArrayList<HuffmanToken> tokens) throws IOException
 	{
-		// Variable initialization and compression steps stubbed out here.
-
-		ArrayList<HuffmanToken> tokens = countTokens(data);
-		Map<Byte, ArrayList<Boolean>> charMap = createEncodingMap(tokens);
-		ArrayList<Boolean> encodedBits = encodeBytes(data, charMap);
-
-		if (debug)
-			HuffmanTools.dumpHuffmanCodes(tokens);
-
-		try
-		{
-			ByteArrayOutputStream byteOutput = new ByteArrayOutputStream();
-			DataOutputStream output = new DataOutputStream(byteOutput);
-
-			output.writeInt(data.length);
-			writeTokenList(output, tokens);
-			writeBitCodes(output, encodedBits);
-
-			return byteOutput.toByteArray();
-		}
-		catch (IOException e)
-		{
-			System.out.println("Fatal compression error: " + e.getMessage());
-			e.printStackTrace();
-			return new byte[0];
-		}
-
-	}
-
-	/**
-	 * Given an array of bytes that contain compressed data that was compressed using this compressor, this method will reconstruct and return the original, uncompressed data. The
-	 * compressed bytes must contain sufficient information so that this method can reconstruct the original data bytes.
-	 * 
-	 * Huffman coding is used to decompress the data.
-	 * <p>
-	 * &nbsp;
-	 * <p>
-	 * 
-	 * Some of the code for this method has been provided for you. You should figure out what it does, it will significantly help you.
-	 * 
-	 * @param compressedData
-	 *            An array of bytes that contains some data in compressed form
-	 * @return An array of bytes that contains the original, uncompressed data
-	 */
-	public byte[] decompress(byte[] compressedData)
-	{
-		int dataLength;
-		ArrayList<HuffmanToken> tokens;
-		ArrayList<Boolean> encodedBits;
-
-		try
-		{
-			ByteArrayInputStream byteInput = new ByteArrayInputStream(compressedData);
-			DataInputStream input = new DataInputStream(byteInput);
-
-			dataLength = input.readInt();
-			tokens = readTokenList(input);
-			encodedBits = readBitCodes(input);
-
-			HuffmanNode root = buildHuffmanCodeTree(tokens);
-
-			if (debug)
-				HuffmanTools.dumpHuffmanCodes(tokens); // Useful for debugging
-
-			return decodeBits(encodedBits, root, dataLength);
-		}
-		catch (IOException e)
-		{
-			System.out.println("Fatal compression error: " + e.getMessage());
-			e.printStackTrace();
-			return null;
-		}
-	}
-
-	/**
-	 * The student should write the comments for this method.
-	 */
-	public void writeTokenList(DataOutputStream output, ArrayList<HuffmanToken> tokens) throws IOException
-	{
+		// Write the size of the token list //
 		output.writeInt(tokens.size());
 
 		for (HuffmanToken token : tokens)
 		{
+			// Write the value of the token //
 			output.writeByte(token.getValue());
+
+			// Write the frequency of the token //
 			output.writeInt(token.getFrequency());
 		}
 	}
 
 	/**
-	 * The student should write the comments for this method.
+	 * This helper method reads data from the input stream and converts the incoming data into a list of Huffman tokens.
+	 * 
+	 * @param input
+	 *            the input stream to read from
+	 * @return the array list of huffman tokens
+	 * @throws IOException
+	 *             Signals that an I/O exception has occurred.
 	 */
-	public ArrayList<HuffmanToken> readTokenList(DataInputStream input) throws IOException
+	private ArrayList<HuffmanToken> readTokenList(DataInputStream input) throws IOException
 	{
 		ArrayList<HuffmanToken> tokens = new ArrayList<HuffmanToken>();
 
+		// Get the size of the token table //
 		int count = input.readInt();
 
 		for (int i = 0; i < count; i++)
 		{
+			// Read the value of the token //
 			HuffmanToken token = new HuffmanToken(input.readByte());
+
+			// Read the frequency of the token //
 			token.setFrequency(input.readInt());
+
 			tokens.add(token);
 		}
 
@@ -366,12 +441,21 @@ public class HuffmanCompressor implements Compressor
 	}
 
 	/**
-	 * The student should write the comments for this method.
+	 * Writes the array of booleans (represents 1 or 0 bits) to the specified output stream.
+	 * 
+	 * @param output
+	 *            the output stream to write to
+	 * @param bits
+	 *            the bits to write
+	 * @return the number of bytes written.
+	 * @throws IOException
+	 *             Signals that an I/O exception has occurred.
 	 */
-	public int writeBitCodes(DataOutputStream output, ArrayList<Boolean> bits) throws IOException
+	private int writeBitCodes(DataOutputStream output, ArrayList<Boolean> bits) throws IOException
 	{
 		int bytesWritten = 0;
 
+		// Convert 8 bit chunks into a byte //
 		for (int pos = 0; pos < bits.size(); pos += 8)
 		{
 			int b = 0;
@@ -381,6 +465,8 @@ public class HuffmanCompressor implements Compressor
 				if (pos + i < bits.size() && bits.get(pos + i))
 					b = b + 1;
 			}
+
+			// Write the obtained byte to the output stream //
 			output.writeByte((byte) b);
 			bytesWritten++;
 		}
@@ -389,20 +475,35 @@ public class HuffmanCompressor implements Compressor
 	}
 
 	/**
-	 * The student should write the comments for this method.
+	 * This helper method reads data from the input stream and converts it into an array of booleans (representing 1 and 0 bits)
+	 * 
+	 * @param input
+	 *            the input stream to read from
+	 * @return the array list of booleans
+	 * @throws IOException
+	 *             Signals that an I/O exception has occurred.
 	 */
-	public ArrayList<Boolean> readBitCodes(DataInputStream input) throws IOException
+	private ArrayList<Boolean> readBitCodes(DataInputStream input) throws IOException
 	{
 		ArrayList<Boolean> bits = new ArrayList<Boolean>();
 
 		while (input.available() > 0)
 		{
+			// Reads the byte in 8 bit chunks //
 			int b = input.readByte();
 
+			// Read each bit from the obtained byte //
 			for (int i = 7; i >= 0; i--)
 				bits.add(((b >> i) & 1) == 1);
 		}
 
 		return bits;
 	}
+
+	// ===========================================================
+	// Inner and Anonymous Classes
+	// ===========================================================
+
+
+
 }
