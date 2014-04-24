@@ -1,8 +1,11 @@
 package homework10;
 
-import java.io.*;
-import java.util.*;
-import javax.swing.*;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.ArrayList;
+
+import javax.swing.JFileChooser;
 
 /**
  * This is a set of tools you may use to help you debug your HuffmanCompressor class. Each of the static methods below are simply used for loading, storing, converting, and

@@ -189,8 +189,56 @@ public class HuffmanCompressor implements Compressor
 	 */
 	public byte[] decodeBits(ArrayList<Boolean> bitCodes, HuffmanNode codeTree, int dataLength)
 	{
-		// Stubbed out
-		return null;
+		ByteArrayOutputStream byteOutput = new ByteArrayOutputStream(dataLength);
+		DataOutputStream output = new DataOutputStream(byteOutput);
+
+		HuffmanNode currentNode = codeTree;
+		int index = 0;
+		try
+		{
+			while (output.size() < dataLength)
+			{
+				if(index >= bitCodes.size())
+				{
+					output.write(currentNode.getToken().getValue());
+					currentNode = codeTree;
+					return byteOutput.toByteArray();
+				}
+				if (!bitCodes.get(index))
+				{
+					if (currentNode.getToken() == null)
+					{
+						currentNode = currentNode.getLeftSubtree();
+						index++;
+					}
+					else
+					{
+						output.write(currentNode.getToken().getValue());
+						currentNode = codeTree;
+					}
+				}
+				else
+				{
+					if (currentNode.getToken() == null)
+					{
+						currentNode = currentNode.getRightSubtree();
+						index++;
+					}
+					else
+					{
+						output.write(currentNode.getToken().getValue());
+						currentNode = codeTree;
+					}
+				}
+
+			}
+		}
+		catch (IOException e)
+		{
+			e.printStackTrace();
+		}
+		
+		return byteOutput.toByteArray();
 	}
 
 	/**
@@ -256,11 +304,6 @@ public class HuffmanCompressor implements Compressor
 	 */
 	public byte[] decompress(byte[] compressedData)
 	{
-		// Variable initialization stubbed out here.
-
-		// You need to set up the appropriate variables before this code begins. This
-		// code will extract various data elements from the compressedData bytes for you.
-
 		int dataLength;
 		ArrayList<HuffmanToken> tokens;
 		ArrayList<Boolean> encodedBits;
@@ -273,6 +316,13 @@ public class HuffmanCompressor implements Compressor
 			dataLength = input.readInt();
 			tokens = readTokenList(input);
 			encodedBits = readBitCodes(input);
+
+			HuffmanNode root = buildHuffmanCodeTree(tokens);
+
+			if (debug)
+				HuffmanTools.dumpHuffmanCodes(tokens); // Useful for debugging
+
+			return decodeBits(encodedBits, root, dataLength);
 		}
 		catch (IOException e)
 		{
@@ -280,18 +330,7 @@ public class HuffmanCompressor implements Compressor
 			e.printStackTrace();
 			return null;
 		}
-
-		// Decompression steps stubbed out here.
-
-		if (debug)
-			HuffmanTools.dumpHuffmanCodes(tokens); // Useful for debugging
-
-		// Return statement stubbed out.
-		return null;
 	}
-
-	// The following methods read and write data values from a ByteArray Streams. Because I'm giving you
-	// this code, you should try to comment these methods yourself.
 
 	/**
 	 * The student should write the comments for this method.

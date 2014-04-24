@@ -1,6 +1,5 @@
 package homework10;
 
-import java.util.*;
 
 /**
  * Objects of this class represent one node in a Huffman tree. A Huffman tree is a binary two-tree, so each node has a left and right child (or no children). In addition, a
